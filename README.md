@@ -104,5 +104,5 @@ cd backend && npm test      # corre la suite completa con cobertura
 ---
 
 <p align="center">
-<i>🏍️ Desarrollado por <a href="https://github.com/Steve-Smith-CODE">@Steve-Smith-CODE</a> — Proyecto académico, UNSCH</i>
+<i>🏍️ Desarrollado por <a href="https://github.com/Steve-Smith-CODE">@Brandon-Montero-CODE</a> — Proyecto académico, UNSCH</i>
 </p>
