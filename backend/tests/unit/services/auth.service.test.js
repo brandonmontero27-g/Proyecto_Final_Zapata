@@ -14,7 +14,7 @@ describe('Auth Service (Supabase local real)', () => {
         email,
         password: 'TestPass123!',
         name: 'Rubén Mendoza',
-        role: 'student'
+        role: 'buyer'
       });
       trackUserForCleanup(result.id);
 
@@ -23,7 +23,7 @@ describe('Auth Service (Supabase local real)', () => {
     });
 
     it('lanza error con statusCode 400 si el email ya esta registrado', async () => {
-      const existing = await createRealUser({ role: 'student' });
+      const existing = await createRealUser({ role: 'buyer' });
 
       await expect(
         registerUser({ email: existing.email, password: 'OtherPass123!', name: 'Duplicado' })
@@ -33,7 +33,7 @@ describe('Auth Service (Supabase local real)', () => {
 
   describe('loginUser', () => {
     it('devuelve un token real y el perfil creado por el trigger de Supabase', async () => {
-      const user = await createRealUser({ role: 'student', name: 'Ruben Login', career: 'Ingenieria de Sistemas' });
+      const user = await createRealUser({ role: 'buyer', name: 'Ruben Login' });
 
       const result = await loginUser({ email: user.email, password: user.password });
 
@@ -42,13 +42,12 @@ describe('Auth Service (Supabase local real)', () => {
         id: user.id,
         email: user.email,
         name: 'Ruben Login',
-        role: 'student',
-        career: 'Ingenieria de Sistemas'
+        role: 'buyer'
       });
     });
 
     it('lanza error con statusCode 401 si las credenciales son invalidas', async () => {
-      const user = await createRealUser({ role: 'student' });
+      const user = await createRealUser({ role: 'buyer' });
 
       await expect(loginUser({ email: user.email, password: 'ContraseniaIncorrecta1!' })).rejects.toMatchObject({
         message: 'Credenciales invalidas',

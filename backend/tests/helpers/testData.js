@@ -3,10 +3,10 @@ import { supabaseAdmin } from '../../src/config/supabase.js';
 const createdUserIds = [];
 
 export function uniqueEmail(prefix) {
-  return `${prefix}.${Date.now()}.${Math.floor(Math.random() * 1000000)}@test.yachakuqwasi.local`;
+  return `${prefix}.${Date.now()}.${Math.floor(Math.random() * 1000000)}@test.motomarket.local`;
 }
 
-export async function createRealUser({ role = 'student', name = 'Test User', password = 'TestPass123!', ...rest } = {}) {
+export async function createRealUser({ role = 'buyer', name = 'Test User', password = 'TestPass123!', ...rest } = {}) {
   const email = uniqueEmail(role);
   const { data, error } = await supabaseAdmin.auth.admin.createUser({
     email,

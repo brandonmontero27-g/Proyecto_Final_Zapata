@@ -3,19 +3,22 @@
 @theme {
   --font-sans: "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
-  --color-guindo: #7a1c1c;
-  --color-guindo-dark: #581212;
-  --color-guindo-light: #9b2d2d;
-  --color-plomo: #64748b;
-  --color-plomo-dark: #334155;
-  --color-plomo-light: #e2e8f0;
-  --color-plomo-lighter: #f8fafc;
-  --color-dorado: #ffd700;
-  --color-dorado-dark: #ffc000;
+  --color-moto-black: #0a0a0a;
+  --color-moto-black-soft: #161616;
+  --color-moto-black-softer: #1e1e1e;
+  --color-moto-gray: #8b93a1;
+  --color-moto-gray-light: #c2c8d2;
+  --color-moto-red: #dc2626;
+  --color-moto-red-dark: #991b1b;
+  --color-moto-red-light: #ef4444;
+  --color-moto-navy: #14284d;
+  --color-moto-navy-light: #2c4a80;
+  --color-moto-white: #f1f5f9;
 }
 
 body {
-  background-color: #fdfbf7;
+  background-color: var(--color-moto-black);
+  color: var(--color-moto-white);
 }
 
 @keyframes fade-in {

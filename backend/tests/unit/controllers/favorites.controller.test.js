@@ -2,32 +2,34 @@ import { add, remove, list } from '../../../src/controllers/favorites.controller
 import { supabaseAdmin } from '../../../src/config/supabase.js';
 import { createRealUser, cleanupCreatedUsers } from '../../helpers/testData.js';
 
-const createdListingIds = [];
+const createdMotorcycleIds = [];
 
 afterAll(async () => {
-  for (const id of createdListingIds.splice(0)) {
-    await supabaseAdmin.from('housing_listings').delete().eq('id', id).catch?.(() => {});
+  for (const id of createdMotorcycleIds.splice(0)) {
+    await supabaseAdmin.from('motorcycles').delete().eq('id', id).catch?.(() => {});
   }
   await cleanupCreatedUsers();
 });
 
-async function insertApprovedListing(landlordId) {
+async function insertApprovedMotorcycle(sellerId) {
   const { data, error } = await supabaseAdmin
-    .from('housing_listings')
+    .from('motorcycles')
     .insert({
-      landlord_id: landlordId,
-      title: 'Habitacion favorita controller',
-      price_pen: 250,
-      distance_to_unsch_minutes: 6,
-      neighborhood: 'San Blas',
-      address: 'Jr. Favorito Controller 1',
+      seller_id: sellerId,
+      title: 'Moto favorita controller',
+      brand: 'Honda',
+      model: 'CB1',
+      year: 2020,
+      displacement_cc: 150,
+      price: 6000,
+      location: 'San Blas',
       contact_phone: '900000000',
       status: 'approved'
     })
     .select()
     .single();
   if (error) throw error;
-  createdListingIds.push(data.id);
+  createdMotorcycleIds.push(data.id);
   return data;
 }
 
@@ -40,47 +42,47 @@ describe('Favorites Controller (Supabase local real)', () => {
   });
 
   it('add agrega un favorito real y responde 201', async () => {
-    const student = await createRealUser({ role: 'student' });
-    const landlord = await createRealUser({ role: 'landlord' });
-    const listing = await insertApprovedListing(landlord.id);
+    const buyer = await createRealUser({ role: 'buyer' });
+    const seller = await createRealUser({ role: 'seller' });
+    const moto = await insertApprovedMotorcycle(seller.id);
 
-    req.user = { id: student.id };
-    req.body = { listingId: listing.id };
+    req.user = { id: buyer.id };
+    req.body = { motorcycleId: moto.id };
     await add(req, res);
 
     expect(res.status).toHaveBeenCalledWith(201);
     const body = res.json.mock.calls[0][0];
-    expect(body.listing_id).toBe(listing.id);
+    expect(body.motorcycle_id).toBe(moto.id);
   });
 
   it('remove elimina un favorito real y responde con el mensaje', async () => {
-    const student = await createRealUser({ role: 'student' });
-    const landlord = await createRealUser({ role: 'landlord' });
-    const listing = await insertApprovedListing(landlord.id);
+    const buyer = await createRealUser({ role: 'buyer' });
+    const seller = await createRealUser({ role: 'seller' });
+    const moto = await insertApprovedMotorcycle(seller.id);
 
-    req.user = { id: student.id };
-    req.body = { listingId: listing.id };
+    req.user = { id: buyer.id };
+    req.body = { motorcycleId: moto.id };
     await add(req, res);
 
-    req.params.listingId = listing.id;
+    req.params.motorcycleId = moto.id;
     await remove(req, res);
 
     expect(res.json).toHaveBeenCalledWith({ message: 'Favorito eliminado' });
   });
 
-  it('list responde con los favoritos reales del estudiante autenticado', async () => {
-    const student = await createRealUser({ role: 'student' });
-    const landlord = await createRealUser({ role: 'landlord' });
-    const listing = await insertApprovedListing(landlord.id);
+  it('list responde con los favoritos reales del comprador autenticado', async () => {
+    const buyer = await createRealUser({ role: 'buyer' });
+    const seller = await createRealUser({ role: 'seller' });
+    const moto = await insertApprovedMotorcycle(seller.id);
 
-    req.user = { id: student.id };
-    req.body = { listingId: listing.id };
+    req.user = { id: buyer.id };
+    req.body = { motorcycleId: moto.id };
     await add(req, res);
 
-    req.user = { id: student.id };
+    req.user = { id: buyer.id };
     await list(req, res);
 
     const body = res.json.mock.calls[res.json.mock.calls.length - 1][0];
-    expect(body.map((l) => l.id)).toContain(listing.id);
+    expect(body.map((m) => m.id)).toContain(moto.id);
   });
 });

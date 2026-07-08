@@ -4,8 +4,8 @@ export function countProfiles() {
   return supabaseAdmin.from('profiles').select('*', { count: 'exact', head: true });
 }
 
-export function countHousings() {
-  return supabaseAdmin.from('housing_listings').select('*', { count: 'exact', head: true });
+export function countMotorcycles() {
+  return supabaseAdmin.from('motorcycles').select('*', { count: 'exact', head: true });
 }
 
 export function countPendingDocuments() {
@@ -35,15 +35,15 @@ export function updateProfileVerification(userId, fields) {
   return supabaseAdmin.from('profiles').update(fields).eq('id', userId);
 }
 
-export function findPendingHousings() {
+export function findPendingMotorcycles() {
   return supabaseAdmin
-    .from('housing_listings')
-    .select('*, profiles!housing_listings_landlord_id_fkey(name, phone)')
+    .from('motorcycles')
+    .select('*, profiles!motorcycles_seller_id_fkey(name, phone)')
     .eq('status', 'pending');
 }
 
-export function updateHousingStatusRecord(housingId, status) {
-  return supabaseAdmin.from('housing_listings').update({ status }).eq('id', housingId).select().single();
+export function updateMotorcycleStatusRecord(motorcycleId, status) {
+  return supabaseAdmin.from('motorcycles').update({ status }).eq('id', motorcycleId).select().single();
 }
 
 export function updateProfileBlock(userId, { blockedUntil, motivo }) {
@@ -53,10 +53,10 @@ export function updateProfileBlock(userId, { blockedUntil, motivo }) {
     .eq('id', userId);
 }
 
-export function findAllHousingsAdmin() {
+export function findAllMotorcyclesAdmin() {
   return supabaseAdmin
-    .from('housing_listings')
-    .select('*, profiles!housing_listings_landlord_id_fkey(name, phone)')
+    .from('motorcycles')
+    .select('*, profiles!motorcycles_seller_id_fkey(name, phone)')
     .order('created_at', { ascending: false });
 }
 

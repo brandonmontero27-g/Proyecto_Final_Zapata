@@ -17,46 +17,46 @@ afterAll(async () => {
 
 describe('verification.service (Supabase Storage + DB real)', () => {
   it('sube un documento real, lo guarda pending y marca el perfil como verification_status pending', async () => {
-    const student = await createRealUser({ role: 'student' });
+    const buyer = await createRealUser({ role: 'buyer' });
 
-    const documento = await submitVerificationDocument(student.id, TINY_PNG_BASE64);
+    const documento = await submitVerificationDocument(buyer.id, TINY_PNG_BASE64);
     createdDocIds.push(documento.id);
 
-    expect(documento.user_id).toBe(student.id);
+    expect(documento.user_id).toBe(buyer.id);
     expect(documento.status).toBe('pending');
 
-    const { data: profile } = await supabaseAdmin.from('profiles').select('*').eq('id', student.id).single();
+    const { data: profile } = await supabaseAdmin.from('profiles').select('*').eq('id', buyer.id).single();
     expect(profile.verification_status).toBe('pending');
   });
 
   it('acepta base64 plano sin el prefijo data:image/...;base64,', async () => {
-    const student = await createRealUser({ role: 'student' });
+    const buyer = await createRealUser({ role: 'buyer' });
     const plainBase64 = TINY_PNG_BASE64.split(',')[1];
 
-    const documento = await submitVerificationDocument(student.id, plainBase64);
+    const documento = await submitVerificationDocument(buyer.id, plainBase64);
     createdDocIds.push(documento.id);
 
     expect(documento.doc_url).toMatch(/\.webp$/);
   });
 
   it('rechaza una imagen que excede el limite de 5MB', async () => {
-    const student = await createRealUser({ role: 'student' });
+    const buyer = await createRealUser({ role: 'buyer' });
     const bigBuffer = Buffer.alloc(5 * 1024 * 1024 + 1, 0);
     const bigImage = 'data:image/png;base64,' + bigBuffer.toString('base64');
 
-    await expect(submitVerificationDocument(student.id, bigImage)).rejects.toMatchObject({ statusCode: 400 });
+    await expect(submitVerificationDocument(buyer.id, bigImage)).rejects.toMatchObject({ statusCode: 400 });
   });
 
   it('rechaza un formato valido para sharp pero no permitido (gif)', async () => {
-    const student = await createRealUser({ role: 'student' });
+    const buyer = await createRealUser({ role: 'buyer' });
     const tinyGifBase64 = 'R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBTAA7';
     const gifImage = 'data:image/gif;base64,' + tinyGifBase64;
 
-    await expect(submitVerificationDocument(student.id, gifImage)).rejects.toMatchObject({ statusCode: 400 });
+    await expect(submitVerificationDocument(buyer.id, gifImage)).rejects.toMatchObject({ statusCode: 400 });
   });
 
   it('lanza error con statusCode 400 si el repositorio falla al guardar el documento', async () => {
-    const student = await createRealUser({ role: 'student' });
+    const buyer = await createRealUser({ role: 'buyer' });
     const originalFn = verificationRepo.insertVerificationDocument;
     verificationRepo.insertVerificationDocument = jest.fn().mockResolvedValue({
       data: null,
@@ -64,7 +64,7 @@ describe('verification.service (Supabase Storage + DB real)', () => {
     });
 
     try {
-      await expect(submitVerificationDocument(student.id, TINY_PNG_BASE64)).rejects.toMatchObject({
+      await expect(submitVerificationDocument(buyer.id, TINY_PNG_BASE64)).rejects.toMatchObject({
         statusCode: 400
       });
     } finally {

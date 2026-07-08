@@ -3,9 +3,7 @@ import { z } from 'zod';
 export const updateProfileSchema = z
   .object({
     name: z.string().min(1).optional(),
-    phone: z.string().optional(),
-    faculty: z.string().optional(),
-    career: z.string().optional()
+    phone: z.string().optional()
   })
   .refine((data) => Object.keys(data).length > 0, { message: 'Debes enviar al menos un campo' });
 

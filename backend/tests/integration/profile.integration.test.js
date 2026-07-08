@@ -16,8 +16,8 @@ const TINY_PNG_BASE64 =
 
 describe('Profile Integration (Supabase local real)', () => {
   it('debe actualizar nombre y telefono del propio perfil', async () => {
-    const student = await createRealUser({ role: 'student' });
-    const token = await loginAndGetToken(student);
+    const buyer = await createRealUser({ role: 'buyer' });
+    const token = await loginAndGetToken(buyer);
 
     const res = await request(app)
       .patch('/api/perfil')
@@ -30,8 +30,8 @@ describe('Profile Integration (Supabase local real)', () => {
   });
 
   it('no debe permitir cambiar role/is_verified via mass-assignment (Zod strip)', async () => {
-    const student = await createRealUser({ role: 'student' });
-    const token = await loginAndGetToken(student);
+    const buyer = await createRealUser({ role: 'buyer' });
+    const token = await loginAndGetToken(buyer);
 
     const res = await request(app)
       .patch('/api/perfil')
@@ -39,13 +39,13 @@ describe('Profile Integration (Supabase local real)', () => {
       .send({ name: 'Intento De Escalada', role: 'admin', is_verified: true });
 
     expect(res.status).toBe(200);
-    expect(res.body.profile.role).toBe('student');
+    expect(res.body.profile.role).toBe('buyer');
     expect(res.body.profile.is_verified).toBe(false);
   });
 
   it('debe rechazar body vacio', async () => {
-    const student = await createRealUser({ role: 'student' });
-    const token = await loginAndGetToken(student);
+    const buyer = await createRealUser({ role: 'buyer' });
+    const token = await loginAndGetToken(buyer);
 
     const res = await request(app).patch('/api/perfil').set('Authorization', `Bearer ${token}`).send({});
 
@@ -58,8 +58,8 @@ describe('Profile Integration (Supabase local real)', () => {
   });
 
   it('debe cambiar la contraseña y permitir login con la nueva', async () => {
-    const student = await createRealUser({ role: 'student' });
-    const token = await loginAndGetToken(student);
+    const buyer = await createRealUser({ role: 'buyer' });
+    const token = await loginAndGetToken(buyer);
 
     const res = await request(app)
       .patch('/api/perfil/password')
@@ -70,15 +70,15 @@ describe('Profile Integration (Supabase local real)', () => {
 
     const loginRes = await request(app)
       .post('/api/auth/login')
-      .send({ email: student.email, password: 'NuevaPass123!' });
+      .send({ email: buyer.email, password: 'NuevaPass123!' });
 
     expect(loginRes.status).toBe(200);
     expect(loginRes.body).toHaveProperty('token');
   });
 
   it('debe rechazar una contraseña muy corta', async () => {
-    const student = await createRealUser({ role: 'student' });
-    const token = await loginAndGetToken(student);
+    const buyer = await createRealUser({ role: 'buyer' });
+    const token = await loginAndGetToken(buyer);
 
     const res = await request(app)
       .patch('/api/perfil/password')
@@ -89,8 +89,8 @@ describe('Profile Integration (Supabase local real)', () => {
   });
 
   it('debe subir una foto de perfil real y guardar la URL en el propio perfil', async () => {
-    const student = await createRealUser({ role: 'student' });
-    const token = await loginAndGetToken(student);
+    const buyer = await createRealUser({ role: 'buyer' });
+    const token = await loginAndGetToken(buyer);
 
     const res = await request(app)
       .post('/api/perfil/avatar')

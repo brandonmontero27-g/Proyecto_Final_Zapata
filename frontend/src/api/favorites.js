@@ -4,10 +4,10 @@ export function listFavoritesRequest(token) {
   return apiFetch("/favoritos", { token });
 }
 
-export function addFavoriteRequest(token, listingId) {
-  return apiFetch("/favoritos", { method: "POST", token, body: { listingId } });
+export function addFavoriteRequest(token, motorcycleId) {
+  return apiFetch("/favoritos", { method: "POST", token, body: { motorcycleId } });
 }
 
-export function removeFavoriteRequest(token, listingId) {
-  return apiFetch(`/favoritos/${listingId}`, { method: "DELETE", token });
+export function removeFavoriteRequest(token, motorcycleId) {
+  return apiFetch(`/favoritos/${motorcycleId}`, { method: "DELETE", token });
 }

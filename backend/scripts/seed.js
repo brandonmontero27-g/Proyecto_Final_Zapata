@@ -1,62 +1,61 @@
 import 'dotenv/config';
-import { createUser, createListing, addFavorite, pickRandom, buildSyntheticListing } from './seed-helpers.js';
+import { createUser, createListing, addFavorite, pickRandom, buildSyntheticListing, BRANDS } from './seed-helpers.js';
 import { DEMO_ACCOUNTS } from './demo-credentials.js';
 
-// Mismos barrios que frontend/src/constants/content.js (NEIGHBORHOODS) para
-// que los filtros del explorador siempre encuentren resultados.
-const NEIGHBORHOODS = ['San Blas', 'Av. Independencia', 'Belén', 'Carmen Alto', 'Santa Ana'];
-const TYPES = ['room', 'apartment', 'shared', 'family'];
+// Mismas ciudades que frontend/src/constants/content.js (LOCATIONS) para
+// que los filtros del catalogo siempre encuentren resultados.
+const CITIES = ['Lima', 'Arequipa', 'Trujillo', 'Cusco', 'Ayacucho', 'Chiclayo', 'Piura'];
 
 async function seed() {
   console.log('Iniciando seed con datos sinteticos (no reales, sin scraping)...');
 
-  await createUser({ ...DEMO_ACCOUNTS.admin, role: 'admin', name: 'Admin YachakuqWasi' });
+  await createUser({ ...DEMO_ACCOUNTS.admin, role: 'admin', name: 'Admin MotoMarket' });
   console.log('Administrador creado.');
 
-  const landlords = [];
-  landlords.push(await createUser({ ...DEMO_ACCOUNTS.landlord, role: 'landlord', name: 'Arrendador Demo' }));
+  const sellers = [];
+  sellers.push(await createUser({ ...DEMO_ACCOUNTS.seller, role: 'seller', name: 'Vendedor Demo' }));
   for (let i = 2; i <= 5; i++) {
-    landlords.push(
+    sellers.push(
       await createUser({
-        email: `arrendador${i}@yachakuqwasi.pe`,
+        email: `vendedor${i}@motomarket.pe`,
         password: 'Demo1234!',
-        role: 'landlord',
-        name: `Arrendador Demo ${i}`
+        role: 'seller',
+        name: `Vendedor Demo ${i}`
       })
     );
   }
-  console.log(`${landlords.length} arrendadores creados.`);
+  console.log(`${sellers.length} vendedores creados.`);
 
-  const students = [];
-  students.push(await createUser({ ...DEMO_ACCOUNTS.student, role: 'student', name: 'Estudiante Demo' }));
+  const buyers = [];
+  buyers.push(await createUser({ ...DEMO_ACCOUNTS.buyer, role: 'buyer', name: 'Comprador Demo' }));
   for (let i = 2; i <= 5; i++) {
-    students.push(
+    buyers.push(
       await createUser({
-        email: `estudiante${i}@yachakuqwasi.pe`,
+        email: `comprador${i}@motomarket.pe`,
         password: 'Demo1234!',
-        role: 'student',
-        name: `Estudiante Demo ${i}`
+        role: 'buyer',
+        name: `Comprador Demo ${i}`
       })
     );
   }
-  console.log(`${students.length} estudiantes creados.`);
+  console.log(`${buyers.length} compradores creados.`);
 
-  const allListings = [];
-  for (const landlord of landlords) {
+  const allMotorcycles = [];
+  for (const seller of sellers) {
     const numListings = Math.floor(Math.random() * 3) + 2; // 2 a 4
     for (let j = 0; j < numListings; j++) {
-      const neighborhood = NEIGHBORHOODS[Math.floor(Math.random() * NEIGHBORHOODS.length)];
-      const type = TYPES[Math.floor(Math.random() * TYPES.length)];
-      const listing = await createListing(landlord.id, buildSyntheticListing(neighborhood, type));
-      allListings.push(listing);
+      const city = CITIES[Math.floor(Math.random() * CITIES.length)];
+      const brand = BRANDS[Math.floor(Math.random() * BRANDS.length)];
+      const motorcycle = await createListing(seller.id, buildSyntheticListing(city, brand));
+      allMotorcycles.push(motorcycle);
     }
   }
-  console.log(`${allListings.length} publicaciones creadas (todas aprobadas, con fotos de stock por tipo).`);
+  console.log(`${allMotorcycles.length} motos publicadas (todas aprobadas, con fotos de stock por categoria).`);
 
-  for (const student of students) {
-    const favListings = pickRandom(allListings, Math.min(3, allListings.length));
-    for (const listing of favListings) {
-      await addFavorite(student.id, listing.id);
+  for (const buyer of buyers) {
+    const favMotorcycles = pickRandom(allMotorcycles, Math.min(3, allMotorcycles.length));
+    for (const motorcycle of favMotorcycles) {
+      await addFavorite(buyer.id, motorcycle.id);
     }
   }
   console.log('Favoritos asignados.');
@@ -64,8 +63,8 @@ async function seed() {
   console.log('\nSeed completado.');
   console.log('Cuentas de demostracion:');
   console.table([
-    { Rol: 'Estudiante', Email: DEMO_ACCOUNTS.student.email, Contraseña: DEMO_ACCOUNTS.student.password },
-    { Rol: 'Arrendador', Email: DEMO_ACCOUNTS.landlord.email, Contraseña: DEMO_ACCOUNTS.landlord.password },
+    { Rol: 'Comprador', Email: DEMO_ACCOUNTS.buyer.email, Contraseña: DEMO_ACCOUNTS.buyer.password },
+    { Rol: 'Vendedor', Email: DEMO_ACCOUNTS.seller.email, Contraseña: DEMO_ACCOUNTS.seller.password },
     { Rol: 'Administrador', Email: DEMO_ACCOUNTS.admin.email, Contraseña: DEMO_ACCOUNTS.admin.password }
   ]);
 }

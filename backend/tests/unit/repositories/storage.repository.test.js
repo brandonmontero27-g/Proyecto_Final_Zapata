@@ -18,7 +18,7 @@ describe('storage.repository (Supabase Storage real)', () => {
     spy.mockRestore();
 
     const { data: buckets } = await supabaseAdmin.storage.listBuckets();
-    expect(buckets.some((b) => b.name === 'housing-images')).toBe(true);
+    expect(buckets.some((b) => b.name === 'motorcycle-images')).toBe(true);
   });
 
   it('no intenta recrear el bucket si ya existe', async () => {
@@ -29,7 +29,7 @@ describe('storage.repository (Supabase Storage real)', () => {
     await ensureBucketExists();
 
     const { data: buckets } = await supabaseAdmin.storage.listBuckets();
-    const bucketCount = buckets.filter((b) => b.name === 'housing-images').length;
+    const bucketCount = buckets.filter((b) => b.name === 'motorcycle-images').length;
     expect(bucketCount).toBe(1);
   });
 
@@ -41,7 +41,7 @@ describe('storage.repository (Supabase Storage real)', () => {
 
     await expect(uploadImage(path, TINY_PNG, 'image/webp')).rejects.toBeTruthy();
 
-    await supabaseAdmin.storage.from('housing-images').remove([path]);
+    await supabaseAdmin.storage.from('motorcycle-images').remove([path]);
   });
 
   it('valida que el bucket exista antes de subir imagenes', async () => {
@@ -49,7 +49,7 @@ describe('storage.repository (Supabase Storage real)', () => {
     await ensureBucketExists();
 
     const { data: buckets } = await supabaseAdmin.storage.listBuckets();
-    const bucketExists = buckets.some((b) => b.name === 'housing-images');
+    const bucketExists = buckets.some((b) => b.name === 'motorcycle-images');
     expect(bucketExists).toBe(true);
   });
 
@@ -58,9 +58,9 @@ describe('storage.repository (Supabase Storage real)', () => {
     const publicUrl = await uploadImage(path, TINY_PNG, 'image/webp');
 
     expect(publicUrl).toBeTruthy();
-    expect(publicUrl).toContain('housing-images');
+    expect(publicUrl).toContain('motorcycle-images');
     expect(publicUrl).toContain(path);
 
-    await supabaseAdmin.storage.from('housing-images').remove([path]);
+    await supabaseAdmin.storage.from('motorcycle-images').remove([path]);
   });
 });

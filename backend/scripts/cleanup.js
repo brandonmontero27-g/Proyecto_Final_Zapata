@@ -3,7 +3,7 @@ import { supabaseAdmin } from '../src/config/supabase.js';
 
 // Requiere que exista la funcion RPC public.truncate_all_tables()
 // (ver backend/database/maintenance.sql) con permisos solo para service_role.
-const STORAGE_BUCKETS = ['housing-images', 'verification-docs'];
+const STORAGE_BUCKETS = ['motorcycle-images', 'verification-docs'];
 
 async function emptyBucket(bucket) {
   const { data: files, error } = await supabaseAdmin.storage.from(bucket).list();

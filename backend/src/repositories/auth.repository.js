@@ -1,11 +1,11 @@
 import { supabaseAdmin, supabasePublic } from '../config/supabase.js';
 
-export function createAuthUser({ email, password, name, role, faculty, career, phone }) {
+export function createAuthUser({ email, password, name, role, phone }) {
   return supabaseAdmin.auth.admin.createUser({
     email,
     password,
     email_confirm: true,
-    user_metadata: { name, role, faculty, career, phone }
+    user_metadata: { name, role, phone }
   });
 }
 

@@ -1,9 +1,9 @@
 const swaggerSpec = {
   openapi: '3.0.0',
   info: {
-    title: 'API - Alquileres UNSCH',
+    title: 'API - MotoMarket',
     version: '1.0.0',
-    description: 'API de YachakuqWasi para alojamiento estudiantil en Ayacucho (UNSCH).'
+    description: 'API de MotoMarket, plataforma peruana de compra y venta de motocicletas.'
   },
   servers: [{ url: '/api' }],
   components: {
@@ -28,12 +28,10 @@ const swaggerSpec = {
         type: 'object',
         required: ['email', 'password', 'name'],
         properties: {
-          email: { type: 'string', format: 'email', example: 'estudiante@unsch.edu.pe' },
+          email: { type: 'string', format: 'email', example: 'comprador@motomarket.pe' },
           password: { type: 'string', minLength: 6, example: 'MiClaveSegura123!' },
           name: { type: 'string', example: 'Ana Quispe' },
-          role: { type: 'string', enum: ['student', 'landlord', 'admin'], example: 'student' },
-          faculty: { type: 'string', nullable: true },
-          career: { type: 'string', nullable: true },
+          role: { type: 'string', enum: ['buyer', 'seller', 'admin'], example: 'buyer' },
           phone: { type: 'string', nullable: true }
         }
       },
@@ -62,42 +60,61 @@ const swaggerSpec = {
               id: { type: 'string', format: 'uuid' },
               email: { type: 'string', format: 'email' },
               name: { type: 'string' },
-              role: { type: 'string', enum: ['student', 'landlord', 'admin'] }
+              role: { type: 'string', enum: ['buyer', 'seller', 'admin'] }
             }
           }
         }
       },
-      CreateHousingRequest: {
+      CreateMotorcycleRequest: {
         type: 'object',
-        required: ['title', 'pricePen', 'distanceToUnschMinutes', 'neighborhood', 'address', 'contactPhone'],
+        required: ['title', 'brand', 'model', 'year', 'displacementCc', 'price', 'location', 'contactPhone'],
         properties: {
-          title: { type: 'string', example: 'Cuarto amoblado cerca a la UNSCH' },
+          title: { type: 'string', example: 'Honda CB190R 2023' },
+          brand: { type: 'string', example: 'Honda' },
+          model: { type: 'string', example: 'CB190R' },
+          year: { type: 'integer', minimum: 1980, example: 2023 },
+          category: { type: 'string', enum: ['scooter', 'naked', 'deportiva', 'enduro', 'cub', 'electrica'], example: 'naked' },
+          displacementCc: { type: 'integer', minimum: 0, example: 184 },
+          price: { type: 'number', minimum: 0, example: 9500 },
+          mileageKm: { type: 'integer', minimum: 0, example: 3200 },
+          fuelType: { type: 'string', enum: ['gasolina', 'electrica', 'hibrida'], example: 'gasolina' },
+          transmission: { type: 'string', enum: ['manual', 'automatica'], example: 'manual' },
+          color: { type: 'string', example: 'Rojo' },
           description: { type: 'string', nullable: true },
-          pricePen: { type: 'number', minimum: 0, example: 250 },
-          distanceToUnschMinutes: { type: 'integer', minimum: 0, example: 8 },
-          neighborhood: { type: 'string', example: 'San Blas' },
-          address: { type: 'string', example: 'Jr. Tres Máscaras 142' },
-          type: { type: 'string', enum: ['room', 'apartment', 'shared', 'family'], example: 'room' },
-          amenities: { type: 'array', items: { type: 'string' }, example: ['Wi-Fi', 'Agua 24h'] },
+          location: { type: 'string', example: 'Lima' },
+          address: { type: 'string', nullable: true, example: 'Av. Principal 450' },
           contactPhone: { type: 'string', example: '+51987654321' },
+          whatsappPhone: { type: 'string', nullable: true },
+          stock: { type: 'integer', minimum: 0, example: 1 },
+          condition: { type: 'string', enum: ['new', 'used'], example: 'used' },
           images: { type: 'array', items: { type: 'string', format: 'uri' } }
         }
       },
-      HousingListing: {
+      Motorcycle: {
         type: 'object',
         properties: {
           id: { type: 'string', format: 'uuid' },
-          landlord_id: { type: 'string', format: 'uuid' },
+          seller_id: { type: 'string', format: 'uuid' },
           title: { type: 'string' },
-          type: { type: 'string', enum: ['room', 'apartment', 'shared', 'family'] },
-          price_pen: { type: 'number' },
-          distance_to_unsch_minutes: { type: 'integer' },
-          neighborhood: { type: 'string' },
-          address: { type: 'string' },
+          brand: { type: 'string' },
+          model: { type: 'string' },
+          year: { type: 'integer' },
+          category: { type: 'string', enum: ['scooter', 'naked', 'deportiva', 'enduro', 'cub', 'electrica'] },
+          displacement_cc: { type: 'integer' },
+          price: { type: 'number' },
+          mileage_km: { type: 'integer' },
+          fuel_type: { type: 'string', enum: ['gasolina', 'electrica', 'hibrida'] },
+          transmission: { type: 'string', enum: ['manual', 'automatica'] },
+          color: { type: 'string', nullable: true },
           description: { type: 'string', nullable: true },
+          location: { type: 'string' },
+          address: { type: 'string', nullable: true },
           contact_phone: { type: 'string' },
-          amenities: { type: 'array', items: { type: 'string' } },
+          whatsapp_phone: { type: 'string', nullable: true },
           images: { type: 'array', items: { type: 'string' } },
+          stock: { type: 'integer' },
+          condition: { type: 'string', enum: ['new', 'used'] },
+          verified_by_tico: { type: 'boolean' },
           status: { type: 'string', enum: ['pending', 'approved', 'suspended', 'flagged'] },
           created_at: { type: 'string', format: 'date-time' },
           updated_at: { type: 'string', format: 'date-time' }
@@ -107,7 +124,7 @@ const swaggerSpec = {
         type: 'object',
         properties: {
           totalUsers: { type: 'integer' },
-          totalHousings: { type: 'integer' },
+          totalMotorcycles: { type: 'integer' },
           pendingDocuments: { type: 'integer' }
         }
       },
@@ -119,7 +136,7 @@ const swaggerSpec = {
           comentario: { type: 'string', nullable: true }
         }
       },
-      HousingStatusRequest: {
+      MotorcycleStatusRequest: {
         type: 'object',
         required: ['estado'],
         properties: {
@@ -151,9 +168,7 @@ const swaggerSpec = {
         type: 'object',
         properties: {
           name: { type: 'string' },
-          phone: { type: 'string' },
-          faculty: { type: 'string' },
-          career: { type: 'string' }
+          phone: { type: 'string' }
         },
         description: 'Al menos un campo es obligatorio.'
       },
@@ -177,26 +192,24 @@ const swaggerSpec = {
           id: { type: 'string', format: 'uuid' },
           email: { type: 'string', format: 'email' },
           name: { type: 'string' },
-          role: { type: 'string', enum: ['student', 'landlord', 'admin'] },
-          faculty: { type: 'string', nullable: true },
-          career: { type: 'string', nullable: true },
+          role: { type: 'string', enum: ['buyer', 'seller', 'admin'] },
           phone: { type: 'string', nullable: true },
           avatar_url: { type: 'string', nullable: true },
           is_verified: { type: 'boolean' }
         }
       },
-      StudentStats: {
+      BuyerStats: {
         type: 'object',
         properties: {
           savedFavorites: { type: 'integer' },
           activeChats: { type: 'integer' }
         }
       },
-      LandlordStats: {
+      SellerStats: {
         type: 'object',
         properties: {
-          totalListings: { type: 'integer' },
-          listingsByStatus: { type: 'object', additionalProperties: { type: 'integer' }, example: { approved: 3, pending: 1 } },
+          totalMotorcycles: { type: 'integer' },
+          motorcyclesByStatus: { type: 'object', additionalProperties: { type: 'integer' }, example: { approved: 3, pending: 1 } },
           favoritesReceived: { type: 'integer' },
           contactsReceived: { type: 'integer' }
         }
@@ -209,11 +222,11 @@ const swaggerSpec = {
           actor_id: { type: 'string', format: 'uuid', nullable: true },
           type: {
             type: 'string',
-            enum: ['listing_approved', 'listing_flagged', 'listing_suspended', 'listing_pending_review']
+            enum: ['motorcycle_approved', 'motorcycle_flagged', 'motorcycle_suspended', 'motorcycle_pending_review']
           },
           title: { type: 'string' },
           body: { type: 'string', nullable: true },
-          listing_id: { type: 'string', format: 'uuid', nullable: true },
+          motorcycle_id: { type: 'string', format: 'uuid', nullable: true },
           read_at: { type: 'string', format: 'date-time', nullable: true },
           created_at: { type: 'string', format: 'date-time' }
         }
@@ -227,26 +240,26 @@ const swaggerSpec = {
       },
       StartChatRequest: {
         type: 'object',
-        required: ['landlordId', 'listingId'],
+        required: ['sellerId', 'motorcycleId'],
         properties: {
-          landlordId: { type: 'string', format: 'uuid' },
-          listingId: { type: 'string', format: 'uuid' }
+          sellerId: { type: 'string', format: 'uuid' },
+          motorcycleId: { type: 'string', format: 'uuid' }
         }
       },
       SendMessageRequest: {
         type: 'object',
         required: ['text'],
         properties: {
-          text: { type: 'string', minLength: 1, maxLength: 4000, example: '¿Sigue disponible el cuarto?' }
+          text: { type: 'string', minLength: 1, maxLength: 4000, example: '¿Sigue disponible la moto?' }
         }
       },
       Chat: {
         type: 'object',
         properties: {
           id: { type: 'string', format: 'uuid' },
-          student_id: { type: 'string', format: 'uuid' },
-          landlord_id: { type: 'string', format: 'uuid' },
-          listing_id: { type: 'string', format: 'uuid', nullable: true },
+          buyer_id: { type: 'string', format: 'uuid' },
+          seller_id: { type: 'string', format: 'uuid' },
+          motorcycle_id: { type: 'string', format: 'uuid', nullable: true },
           last_message: { type: 'string', nullable: true },
           unread: { type: 'boolean' },
           status: { type: 'string', enum: ['online', 'offline'] }
@@ -257,7 +270,7 @@ const swaggerSpec = {
         properties: {
           id: { type: 'string', format: 'uuid' },
           chat_id: { type: 'string', format: 'uuid' },
-          sender: { type: 'string', enum: ['student', 'landlord'] },
+          sender: { type: 'string', enum: ['buyer', 'seller'] },
           text: { type: 'string' },
           created_at: { type: 'string', format: 'date-time' }
         }
@@ -314,36 +327,40 @@ const swaggerSpec = {
         }
       }
     },
-    '/housings': {
+    '/motorcycles': {
       get: {
-        summary: 'Listar alojamientos aprobados',
-        tags: ['Housings'],
+        summary: 'Listar motos aprobadas (catalogo)',
+        tags: ['Motorcycles'],
         parameters: [
-          { name: 'tipo', in: 'query', schema: { type: 'string', enum: ['room', 'apartment', 'shared', 'family'] } },
-          { name: 'precio_max', in: 'query', schema: { type: 'number' }, description: 'Precio mensual maximo en soles' },
-          { name: 'barrio', in: 'query', schema: { type: 'string' }, example: 'San Blas' }
+          { name: 'marca', in: 'query', schema: { type: 'string' }, example: 'Honda' },
+          { name: 'categoria', in: 'query', schema: { type: 'string', enum: ['scooter', 'naked', 'deportiva', 'enduro', 'cub', 'electrica'] } },
+          { name: 'precio_max', in: 'query', schema: { type: 'number' }, description: 'Precio maximo en soles' },
+          { name: 'anio', in: 'query', schema: { type: 'integer' } },
+          { name: 'estado', in: 'query', schema: { type: 'string', enum: ['new', 'used'] }, description: 'Nueva o usada' },
+          { name: 'page', in: 'query', schema: { type: 'integer' } },
+          { name: 'limit', in: 'query', schema: { type: 'integer' } }
         ],
         responses: {
           200: {
-            description: 'Lista de alojamientos con status = approved',
+            description: 'Lista de motos con status = approved',
             content: {
-              'application/json': { schema: { type: 'array', items: { $ref: '#/components/schemas/HousingListing' } } }
+              'application/json': { schema: { type: 'array', items: { $ref: '#/components/schemas/Motorcycle' } } }
             }
           }
         }
       },
       post: {
-        summary: 'Publicar un alojamiento (arrendador/admin)',
-        tags: ['Housings'],
+        summary: 'Publicar una moto (vendedor/admin)',
+        tags: ['Motorcycles'],
         security: [{ bearerAuth: [] }],
         requestBody: {
           required: true,
-          content: { 'application/json': { schema: { $ref: '#/components/schemas/CreateHousingRequest' } } }
+          content: { 'application/json': { schema: { $ref: '#/components/schemas/CreateMotorcycleRequest' } } }
         },
         responses: {
           201: {
-            description: 'Alojamiento creado con status = pending',
-            content: { 'application/json': { schema: { $ref: '#/components/schemas/HousingListing' } } }
+            description: 'Moto creada con status = pending',
+            content: { 'application/json': { schema: { $ref: '#/components/schemas/Motorcycle' } } }
           },
           400: { $ref: '#/components/responses/BadRequest' },
           401: { $ref: '#/components/responses/Unauthorized' },
@@ -351,10 +368,21 @@ const swaggerSpec = {
         }
       }
     },
-    '/housings/{id}/imagenes': {
+    '/motorcycles/{id}': {
+      get: {
+        summary: 'Detalle de una moto, incluye motos relacionadas',
+        tags: ['Motorcycles'],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } }],
+        responses: {
+          200: { description: 'Moto con campo adicional "related" (hasta 4 motos similares)' },
+          404: { description: 'La moto no existe' }
+        }
+      }
+    },
+    '/motorcycles/{id}/imagenes': {
       post: {
         summary: 'Subir fotos de una publicacion a Supabase Storage (dueño o admin)',
-        tags: ['Housings'],
+        tags: ['Motorcycles'],
         security: [{ bearerAuth: [] }],
         parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } }],
         requestBody: {
@@ -364,7 +392,7 @@ const swaggerSpec = {
         responses: {
           200: {
             description: 'Publicacion actualizada con las nuevas URLs de imagen',
-            content: { 'application/json': { schema: { $ref: '#/components/schemas/HousingListing' } } }
+            content: { 'application/json': { schema: { $ref: '#/components/schemas/Motorcycle' } } }
           },
           400: { $ref: '#/components/responses/BadRequest' },
           401: { $ref: '#/components/responses/Unauthorized' },
@@ -384,7 +412,7 @@ const swaggerSpec = {
         }
       },
       patch: {
-        summary: 'Actualizar nombre/telefono/facultad/carrera de mi propio perfil',
+        summary: 'Actualizar nombre/telefono de mi propio perfil',
         tags: ['Perfil'],
         security: [{ bearerAuth: [] }],
         requestBody: {
@@ -430,25 +458,25 @@ const swaggerSpec = {
         }
       }
     },
-    '/stats/estudiante': {
+    '/stats/comprador': {
       get: {
-        summary: 'KPIs del estudiante autenticado (favoritos, chats activos)',
+        summary: 'KPIs del comprador autenticado (favoritos, chats activos)',
         tags: ['Stats'],
         security: [{ bearerAuth: [] }],
         responses: {
-          200: { description: 'Conteos del estudiante', content: { 'application/json': { schema: { $ref: '#/components/schemas/StudentStats' } } } },
+          200: { description: 'Conteos del comprador', content: { 'application/json': { schema: { $ref: '#/components/schemas/BuyerStats' } } } },
           401: { $ref: '#/components/responses/Unauthorized' },
           403: { $ref: '#/components/responses/Forbidden' }
         }
       }
     },
-    '/stats/arrendador': {
+    '/stats/vendedor': {
       get: {
-        summary: 'KPIs del arrendador autenticado (anuncios por estado, favoritos y contactos recibidos)',
+        summary: 'KPIs del vendedor autenticado (motos por estado, favoritos y contactos recibidos)',
         tags: ['Stats'],
         security: [{ bearerAuth: [] }],
         responses: {
-          200: { description: 'Conteos del arrendador', content: { 'application/json': { schema: { $ref: '#/components/schemas/LandlordStats' } } } },
+          200: { description: 'Conteos del vendedor', content: { 'application/json': { schema: { $ref: '#/components/schemas/SellerStats' } } } },
           401: { $ref: '#/components/responses/Unauthorized' },
           403: { $ref: '#/components/responses/Forbidden' }
         }
@@ -491,7 +519,7 @@ const swaggerSpec = {
     },
     '/chats': {
       post: {
-        summary: 'Iniciar (o reutilizar) un chat con un arrendador sobre una publicacion (solo estudiantes)',
+        summary: 'Iniciar (o reutilizar) un chat con un vendedor sobre una moto (solo compradores)',
         tags: ['Chats'],
         security: [{ bearerAuth: [] }],
         requestBody: {
@@ -506,7 +534,7 @@ const swaggerSpec = {
         }
       },
       get: {
-        summary: 'Listar mis chats (como estudiante o como arrendador)',
+        summary: 'Listar mis chats (como comprador o como vendedor)',
         tags: ['Chats'],
         security: [{ bearerAuth: [] }],
         responses: {
@@ -594,16 +622,16 @@ const swaggerSpec = {
         }
       }
     },
-    '/admin/habitaciones/pendientes': {
+    '/admin/motos/pendientes': {
       get: {
-        summary: 'Listar habitaciones pendientes de aprobacion (admin)',
+        summary: 'Listar motos pendientes de aprobacion (admin)',
         tags: ['Admin'],
         security: [{ bearerAuth: [] }],
         responses: {
           200: {
-            description: 'Lista de habitaciones con status = pending',
+            description: 'Lista de motos con status = pending',
             content: {
-              'application/json': { schema: { type: 'array', items: { $ref: '#/components/schemas/HousingListing' } } }
+              'application/json': { schema: { type: 'array', items: { $ref: '#/components/schemas/Motorcycle' } } }
             }
           },
           401: { $ref: '#/components/responses/Unauthorized' },
@@ -611,18 +639,18 @@ const swaggerSpec = {
         }
       }
     },
-    '/admin/habitaciones/{id}/estado': {
+    '/admin/motos/{id}/estado': {
       put: {
-        summary: 'Aprobar, marcar o suspender una habitacion (admin)',
+        summary: 'Aprobar, observar o suspender una moto (admin)',
         tags: ['Admin'],
         security: [{ bearerAuth: [] }],
         parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } }],
         requestBody: {
           required: true,
-          content: { 'application/json': { schema: { $ref: '#/components/schemas/HousingStatusRequest' } } }
+          content: { 'application/json': { schema: { $ref: '#/components/schemas/MotorcycleStatusRequest' } } }
         },
         responses: {
-          200: { description: 'Habitacion actualizada, envuelta en { listing }' },
+          200: { description: 'Moto actualizada, envuelta en { moto }' },
           400: { $ref: '#/components/responses/BadRequest' },
           401: { $ref: '#/components/responses/Unauthorized' },
           403: { $ref: '#/components/responses/Forbidden' }

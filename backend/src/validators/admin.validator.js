@@ -12,14 +12,14 @@ export const blockUserSchema = z.object({
   dias: z.coerce.number().int().positive().optional()
 });
 
-export const housingStatusSchema = z.object({
+export const motorcycleStatusSchema = z.object({
   estado: z.enum(['approved', 'flagged', 'suspended'], {
     errorMap: () => ({ message: "estado debe ser 'approved', 'flagged' o 'suspended'" })
   })
 });
 
 export const setRoleSchema = z.object({
-  rol: z.enum(['student', 'landlord', 'admin'], {
-    errorMap: () => ({ message: "rol debe ser 'student', 'landlord' o 'admin'" })
+  rol: z.enum(['buyer', 'seller', 'admin'], {
+    errorMap: () => ({ message: "rol debe ser 'buyer', 'seller' o 'admin'" })
   })
 });

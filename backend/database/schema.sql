@@ -1,12 +1,11 @@
 -- ============================================================
--- YachakuqWasi / Alójate UNSCH — Esquema de base de datos
+-- MotoMarket / Plataforma de venta de motocicletas — Esquema de base de datos
 -- Motor: PostgreSQL (Supabase), autenticación: Supabase Auth (auth.users)
--- Reemplaza los mocks de backend/src/routes/*.js por datos reales.
--- Ejecutar en: Supabase Dashboard > SQL Editor, o via `supabase db push`.
 --
--- v2: reemplaza la tabla "users" propia por "profiles", ligada 1:1 a
--- auth.users. El login/registro ahora los maneja Supabase Auth
--- (backend/src/services/auth.service.js) en vez de bcrypt + JWT propio.
+-- v3: dominio migrado de alquileres de habitaciones (UNSCH) a venta de
+-- motocicletas. "profiles" sigue ligada 1:1 a auth.users; login/registro
+-- los maneja Supabase Auth (backend/src/services/auth.service.js).
+-- Ejecutar en: Supabase Dashboard > SQL Editor, o via `supabase db push`.
 -- ============================================================
 
 create extension if not exists pgcrypto; -- gen_random_uuid()
@@ -14,18 +13,21 @@ create extension if not exists pgcrypto; -- gen_random_uuid()
 -- ------------------------------------------------------------
 -- ENUMS
 -- ------------------------------------------------------------
-create type user_role as enum ('student', 'landlord', 'admin');
+create type user_role as enum ('buyer', 'seller', 'admin');
 create type verification_status as enum ('none', 'pending', 'approved', 'rejected');
-create type housing_type as enum ('room', 'apartment', 'shared', 'family');
-create type housing_status as enum ('approved', 'pending', 'suspended', 'flagged');
+create type motorcycle_category as enum ('scooter', 'naked', 'deportiva', 'enduro', 'cub', 'electrica');
+create type motorcycle_condition as enum ('new', 'used');
+create type fuel_type as enum ('gasolina', 'electrica', 'hibrida');
+create type transmission_type as enum ('manual', 'automatica');
+create type listing_status as enum ('approved', 'pending', 'suspended', 'flagged');
 create type chat_presence as enum ('online', 'offline');
-create type message_sender as enum ('student', 'landlord');
-create type audit_log_type as enum ('system', 'user', 'listing');
+create type message_sender as enum ('buyer', 'seller');
+create type audit_log_type as enum ('system', 'user', 'motorcycle');
 create type notification_type as enum (
-  'listing_approved',
-  'listing_flagged',
-  'listing_suspended',
-  'listing_pending_review'
+  'motorcycle_approved',
+  'motorcycle_flagged',
+  'motorcycle_suspended',
+  'motorcycle_pending_review'
 );
 
 -- ------------------------------------------------------------
@@ -47,9 +49,7 @@ $$ language plpgsql;
 create table profiles (
   id                    uuid primary key references auth.users (id) on delete cascade,
   name                  text not null,
-  role                  user_role not null default 'student',
-  faculty               text,
-  career                text,
+  role                  user_role not null default 'buyer',
   phone                 text,
   is_verified           boolean not null default false,
   verification_status   verification_status not null default 'none',
@@ -73,13 +73,11 @@ create trigger trg_profiles_updated_at
 create or replace function handle_new_auth_user()
 returns trigger as $$
 begin
-  insert into public.profiles (id, name, role, faculty, career, phone)
+  insert into public.profiles (id, name, role, phone)
   values (
     new.id,
     coalesce(new.raw_user_meta_data->>'name', split_part(new.email, '@', 1)),
-    coalesce((new.raw_user_meta_data->>'role')::user_role, 'student'),
-    new.raw_user_meta_data->>'faculty',
-    new.raw_user_meta_data->>'career',
+    coalesce((new.raw_user_meta_data->>'role')::user_role, 'buyer'),
     new.raw_user_meta_data->>'phone'
   );
   return new;
@@ -91,75 +89,85 @@ create trigger on_auth_user_created
   for each row execute function handle_new_auth_user();
 
 -- ------------------------------------------------------------
--- TABLA: housing_listings
--- Publicaciones de alquiler creadas por arrendadores.
+-- TABLA: motorcycles
+-- Publicaciones de venta de motos creadas por vendedores.
 -- ------------------------------------------------------------
-create table housing_listings (
-  id                          uuid primary key default gen_random_uuid(),
-  landlord_id                 uuid not null references profiles (id) on delete cascade,
-  title                       text not null,
-  type                        housing_type not null default 'room',
-  price_pen                   numeric(8, 2) not null check (price_pen >= 0),
-  distance_to_unsch_minutes   integer not null check (distance_to_unsch_minutes >= 0),
-  neighborhood                text not null,
-  address                     text not null,
-  description                 text,
-  contact_phone               text not null,
-  amenities                   text[] not null default '{}',
-  images                      text[] not null default '{}',
-  coordinate_x                numeric(5, 2),
-  coordinate_y                numeric(5, 2),
-  verified_by_maki            boolean not null default false,
-  status                      housing_status not null default 'pending',
-  created_at                  timestamptz not null default now(),
-  updated_at                  timestamptz not null default now()
+create table motorcycles (
+  id               uuid primary key default gen_random_uuid(),
+  seller_id        uuid not null references profiles (id) on delete cascade,
+  title            text not null,
+  brand            text not null,
+  model            text not null,
+  year             integer not null check (year >= 1980),
+  category         motorcycle_category not null default 'naked',
+  displacement_cc  integer not null check (displacement_cc >= 0),
+  price            numeric(10, 2) not null check (price >= 0),
+  mileage_km       integer not null default 0 check (mileage_km >= 0),
+  fuel_type        fuel_type not null default 'gasolina',
+  transmission     transmission_type not null default 'manual',
+  color            text,
+  description      text,
+  contact_phone    text not null,
+  whatsapp_phone   text,
+  images           text[] not null default '{}',
+  location         text not null,
+  address          text,
+  coordinate_x     numeric(9, 6),
+  coordinate_y     numeric(9, 6),
+  stock            integer not null default 1 check (stock >= 0),
+  condition        motorcycle_condition not null default 'used',
+  verified_by_tico boolean not null default false,
+  status           listing_status not null default 'pending',
+  created_at       timestamptz not null default now(),
+  updated_at       timestamptz not null default now()
 );
 
-create index idx_listings_status on housing_listings (status);
-create index idx_listings_neighborhood on housing_listings (neighborhood);
-create index idx_listings_type on housing_listings (type);
-create index idx_listings_price on housing_listings (price_pen);
-create index idx_listings_landlord on housing_listings (landlord_id);
--- Búsqueda combinada típica del explorador: barrio + tipo + precio máx.
-create index idx_listings_search on housing_listings (status, neighborhood, type, price_pen);
+create index idx_motorcycles_status on motorcycles (status);
+create index idx_motorcycles_brand on motorcycles (brand);
+create index idx_motorcycles_category on motorcycles (category);
+create index idx_motorcycles_condition on motorcycles (condition);
+create index idx_motorcycles_price on motorcycles (price);
+create index idx_motorcycles_seller on motorcycles (seller_id);
+-- Búsqueda combinada típica del catálogo: marca + año + precio maximo + estado.
+create index idx_motorcycles_search on motorcycles (status, brand, category, price);
 
-create trigger trg_listings_updated_at
-  before update on housing_listings
+create trigger trg_motorcycles_updated_at
+  before update on motorcycles
   for each row execute function set_updated_at();
 
 -- ------------------------------------------------------------
 -- TABLA: favorites
--- Habitaciones guardadas por un estudiante (❤️).
+-- Motos guardadas por un comprador (❤️).
 -- ------------------------------------------------------------
 create table favorites (
-  user_id     uuid not null references profiles (id) on delete cascade,
-  listing_id  uuid not null references housing_listings (id) on delete cascade,
-  created_at  timestamptz not null default now(),
-  primary key (user_id, listing_id)
+  user_id        uuid not null references profiles (id) on delete cascade,
+  motorcycle_id  uuid not null references motorcycles (id) on delete cascade,
+  created_at     timestamptz not null default now(),
+  primary key (user_id, motorcycle_id)
 );
 
-create index idx_favorites_listing on favorites (listing_id);
+create index idx_favorites_motorcycle on favorites (motorcycle_id);
 
 -- ------------------------------------------------------------
 -- TABLA: chats
--- Conversación directa entre un estudiante y un arrendador,
--- generalmente asociada a una publicación.
+-- Conversación directa entre un comprador y un vendedor,
+-- generalmente asociada a una publicación de moto.
 -- ------------------------------------------------------------
 create table chats (
   id             uuid primary key default gen_random_uuid(),
-  student_id     uuid not null references profiles (id) on delete cascade,
-  landlord_id    uuid not null references profiles (id) on delete cascade,
-  listing_id     uuid references housing_listings (id) on delete set null,
+  buyer_id       uuid not null references profiles (id) on delete cascade,
+  seller_id      uuid not null references profiles (id) on delete cascade,
+  motorcycle_id  uuid references motorcycles (id) on delete set null,
   last_message   text,
   unread         boolean not null default true,
   status         chat_presence not null default 'offline',
   created_at     timestamptz not null default now(),
   updated_at     timestamptz not null default now(),
-  unique (student_id, landlord_id, listing_id)
+  unique (buyer_id, seller_id, motorcycle_id)
 );
 
-create index idx_chats_student on chats (student_id);
-create index idx_chats_landlord on chats (landlord_id);
+create index idx_chats_buyer on chats (buyer_id);
+create index idx_chats_seller on chats (seller_id);
 
 create trigger trg_chats_updated_at
   before update on chats
@@ -181,8 +189,8 @@ create index idx_messages_chat_created on chat_messages (chat_id, created_at);
 
 -- ------------------------------------------------------------
 -- TABLA: verification_documents
--- Historial de credenciales subidas para verificación de identidad
--- (endpoint admin: GET /documentos/pendientes, PUT /documentos/:id).
+-- Historial de documentos subidos para verificación de identidad del
+-- vendedor (endpoint admin: GET /documentos/pendientes, PUT /documentos/:id).
 -- ------------------------------------------------------------
 create table verification_documents (
   id            uuid primary key default gen_random_uuid(),
@@ -228,7 +236,7 @@ create table notifications (
   type          notification_type not null,
   title         text not null,
   body          text,
-  listing_id    uuid references housing_listings (id) on delete cascade,
+  motorcycle_id uuid references motorcycles (id) on delete cascade,
   read_at       timestamptz,
   created_at    timestamptz not null default now()
 );
@@ -244,7 +252,7 @@ create index idx_notifications_recipient_unread on notifications (recipient_id) 
 -- la publishable key.
 -- ============================================================
 alter table profiles enable row level security;
-alter table housing_listings enable row level security;
+alter table motorcycles enable row level security;
 alter table favorites enable row level security;
 alter table chats enable row level security;
 alter table chat_messages enable row level security;
@@ -252,8 +260,8 @@ alter table verification_documents enable row level security;
 alter table audit_logs enable row level security;
 alter table notifications enable row level security;
 
--- Lectura pública de publicaciones aprobadas (explorador sin login)
-create policy "listings_public_read" on housing_listings
+-- Lectura pública de motos aprobadas (catálogo sin login)
+create policy "motorcycles_public_read" on motorcycles
   for select using (status = 'approved');
 
 -- Un usuario puede leer y actualizar su propio profile
@@ -271,6 +279,6 @@ create policy "notifications_self_read" on notifications
 create policy "notifications_self_update" on notifications
   for update using (auth.uid() = recipient_id);
 
--- El resto de accesos (escritura de listings, chats, admin) deben ir
+-- El resto de accesos (escritura de motos, chats, admin) deben ir
 -- por el backend con la secret key, o ampliarse con policies propias
 -- de auth.uid() segun se necesite.

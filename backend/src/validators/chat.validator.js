@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
 export const startChatSchema = z.object({
-  landlordId: z.string().uuid('landlordId debe ser un uuid valido'),
-  listingId: z.string().uuid('listingId debe ser un uuid valido')
+  sellerId: z.string().uuid('sellerId debe ser un uuid valido'),
+  motorcycleId: z.string().uuid('motorcycleId debe ser un uuid valido')
 });
 
 export const sendMessageSchema = z.object({

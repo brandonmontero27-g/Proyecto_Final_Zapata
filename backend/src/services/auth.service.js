@@ -1,13 +1,11 @@
 import { createAuthUser, signInWithPassword, findProfileById } from '../repositories/auth.repository.js';
 
-export async function registerUser({ email, password, name, role, faculty, career, phone }) {
+export async function registerUser({ email, password, name, role, phone }) {
   const { data, error } = await createAuthUser({
     email,
     password,
     name,
-    role: role || 'student',
-    faculty,
-    career,
+    role: role || 'buyer',
     phone
   });
 

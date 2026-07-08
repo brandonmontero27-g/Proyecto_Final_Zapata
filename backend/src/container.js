@@ -7,20 +7,20 @@
 //   servicio              -> repository(s) que usa
 //   ----------------------------------------------------
 //   auth.service           -> auth.repository
-//   housing.service         -> housing.repository, storage.repository (via image.service),
+//   motorcycles.service      -> motorcycles.repository, storage.repository (via image.service),
 //                              geocoding.service (best-effort, no toca Supabase)
 //   admin.service            -> admin.repository
 //   chat.service               -> chat.repository
 //   image.service                  -> storage.repository
 //   avatar.service                   -> storage.repository
 //   profile.service                    -> profile.repository, auth.repository (password), avatar.service
-//   stats.service                        -> housing.repository, favorites.repository, chat.repository
+//   stats.service                        -> motorcycles.repository, favorites.repository, chat.repository
 //   notifications.service                  -> notifications.repository
-//     (housing.service y admin.service llaman a notifications.service de forma
+//     (motorcycles.service y admin.service llaman a notifications.service de forma
 //      best-effort al crear/revisar publicaciones, sin que un fallo ahi tumbe la request)
 
 export * as authService from './services/auth.service.js';
-export * as housingService from './services/housing.service.js';
+export * as motorcyclesService from './services/motorcycles.service.js';
 export * as adminService from './services/admin.service.js';
 export * as chatService from './services/chat.service.js';
 export * as imageService from './services/image.service.js';

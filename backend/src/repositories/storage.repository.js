@@ -1,6 +1,6 @@
 import { supabaseAdmin } from '../config/supabase.js';
 
-const DEFAULT_BUCKET = 'housing-images';
+const DEFAULT_BUCKET = 'motorcycle-images';
 
 export async function ensureBucketExists(bucket = DEFAULT_BUCKET) {
   const { data: buckets } = await supabaseAdmin.storage.listBuckets();

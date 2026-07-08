@@ -9,9 +9,9 @@ import {
 import { NotFoundError, AppError } from '../errors/AppError.js';
 
 const REVIEW_TYPE_BY_STATUS = {
-  approved: 'listing_approved',
-  flagged: 'listing_flagged',
-  suspended: 'listing_suspended'
+  approved: 'motorcycle_approved',
+  flagged: 'motorcycle_flagged',
+  suspended: 'motorcycle_suspended'
 };
 
 const REVIEW_TITLE_BY_STATUS = {
@@ -56,33 +56,33 @@ export async function markAllAsRead(userId) {
   return { message: 'Notificaciones marcadas como leídas' };
 }
 
-export async function notifyLandlordOfHousingReview({ landlordId, listingId, listingTitle, estado, actorId }) {
+export async function notifySellerOfMotorcycleReview({ sellerId, motorcycleId, motorcycleTitle, estado, actorId }) {
   const type = REVIEW_TYPE_BY_STATUS[estado];
   if (!type) return;
 
   await insertNotifications([
     {
-      recipient_id: landlordId,
+      recipient_id: sellerId,
       actor_id: actorId ?? null,
       type,
       title: REVIEW_TITLE_BY_STATUS[estado],
-      body: listingTitle,
-      listing_id: listingId
+      body: motorcycleTitle,
+      motorcycle_id: motorcycleId
     }
   ]);
 }
 
-export async function notifyAdminsOfNewHousing({ listingId, listingTitle, actorId }) {
+export async function notifyAdminsOfNewMotorcycle({ motorcycleId, motorcycleTitle, actorId }) {
   const { data: admins, error } = await findAdminIds();
   if (error || !admins?.length) return;
 
   const rows = admins.map((admin) => ({
     recipient_id: admin.id,
     actor_id: actorId ?? null,
-    type: 'listing_pending_review',
+    type: 'motorcycle_pending_review',
     title: 'Nueva publicación pendiente de revisión',
-    body: listingTitle,
-    listing_id: listingId
+    body: motorcycleTitle,
+    motorcycle_id: motorcycleId
   }));
 
   await insertNotifications(rows);

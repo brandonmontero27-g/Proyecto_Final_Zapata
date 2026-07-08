@@ -3,71 +3,73 @@ import * as favoritesRepo from '../../../src/repositories/favorites.repository.j
 import { supabaseAdmin } from '../../../src/config/supabase.js';
 import { createRealUser, cleanupCreatedUsers } from '../../helpers/testData.js';
 
-const createdListingIds = [];
+const createdMotorcycleIds = [];
 
 afterAll(async () => {
-  for (const id of createdListingIds.splice(0)) {
-    await supabaseAdmin.from('housing_listings').delete().eq('id', id).catch?.(() => {});
+  for (const id of createdMotorcycleIds.splice(0)) {
+    await supabaseAdmin.from('motorcycles').delete().eq('id', id).catch?.(() => {});
   }
   await cleanupCreatedUsers();
 });
 
-async function insertApprovedListing(landlordId) {
+async function insertApprovedMotorcycle(sellerId) {
   const { data, error } = await supabaseAdmin
-    .from('housing_listings')
+    .from('motorcycles')
     .insert({
-      landlord_id: landlordId,
-      title: 'Habitacion favorita real',
-      price_pen: 250,
-      distance_to_unsch_minutes: 6,
-      neighborhood: 'San Blas',
-      address: 'Jr. Favorito 1',
+      seller_id: sellerId,
+      title: 'Moto favorita real',
+      brand: 'Honda',
+      model: 'CB1',
+      year: 2020,
+      displacement_cc: 150,
+      price: 6000,
+      location: 'San Blas',
       contact_phone: '900000000',
       status: 'approved'
     })
     .select()
     .single();
   if (error) throw error;
-  createdListingIds.push(data.id);
+  createdMotorcycleIds.push(data.id);
   return data;
 }
 
 describe('Favorites Service (Supabase local real)', () => {
   describe('addFavorite', () => {
     it('agrega un favorito real', async () => {
-      const student = await createRealUser({ role: 'student' });
-      const landlord = await createRealUser({ role: 'landlord' });
-      const listing = await insertApprovedListing(landlord.id);
+      const buyer = await createRealUser({ role: 'buyer' });
+      const seller = await createRealUser({ role: 'seller' });
+      const moto = await insertApprovedMotorcycle(seller.id);
 
-      const favorite = await addFavorite(student.id, listing.id);
+      const favorite = await addFavorite(buyer.id, moto.id);
 
-      expect(favorite.user_id).toBe(student.id);
-      expect(favorite.listing_id).toBe(listing.id);
+      expect(favorite.user_id).toBe(buyer.id);
+      expect(favorite.motorcycle_id).toBe(moto.id);
     });
 
-    it('lanza error con statusCode 400 si el listing_id no existe (violacion de FK real)', async () => {
-      const student = await createRealUser({ role: 'student' });
-      const fakeListingId = '00000000-0000-0000-0000-000000000000';
+    it('lanza error con statusCode 400 si el motorcycle_id no existe (violacion de FK real)', async () => {
+      const buyer = await createRealUser({ role: 'buyer' });
+      const fakeMotorcycleId = '00000000-0000-0000-0000-000000000000';
 
-      await expect(addFavorite(student.id, fakeListingId)).rejects.toMatchObject({ statusCode: 400 });
+      await expect(addFavorite(buyer.id, fakeMotorcycleId)).rejects.toMatchObject({ statusCode: 400 });
     });
   });
 
   describe('removeFavorite', () => {
     it('elimina un favorito real', async () => {
-      const student = await createRealUser({ role: 'student' });
-      const landlord = await createRealUser({ role: 'landlord' });
-      const listing = await insertApprovedListing(landlord.id);
-      await addFavorite(student.id, listing.id);
+      const buyer = await createRealUser({ role: 'buyer' });
+      const seller = await createRealUser({ role: 'seller' });
+      const moto = await insertApprovedMotorcycle(seller.id);
+      await addFavorite(buyer.id, moto.id);
 
-      const result = await removeFavorite(student.id, listing.id);
+      const result = await removeFavorite(buyer.id, moto.id);
 
       expect(result).toEqual({ message: 'Favorito eliminado' });
       const { data } = await supabaseAdmin
         .from('favorites')
         .select('*')
-        .eq('user_id', student.id)
-        .eq('listing_id', listing.id);
+        .eq('user_id', buyer.id)
+        .eq('motorcycle_id', moto.id);
       expect(data).toHaveLength(0);
     });
 
@@ -76,7 +78,7 @@ describe('Favorites Service (Supabase local real)', () => {
       favoritesRepo.deleteFavorite = jest.fn().mockResolvedValue({ error: { message: 'fail' } });
 
       try {
-        await expect(removeFavorite('cualquier-id', 'cualquier-listing')).rejects.toMatchObject({ statusCode: 400 });
+        await expect(removeFavorite('cualquier-id', 'cualquier-moto')).rejects.toMatchObject({ statusCode: 400 });
       } finally {
         favoritesRepo.deleteFavorite = originalFn;
       }
@@ -84,15 +86,15 @@ describe('Favorites Service (Supabase local real)', () => {
   });
 
   describe('listFavorites', () => {
-    it('devuelve los alojamientos favoritos reales del estudiante', async () => {
-      const student = await createRealUser({ role: 'student' });
-      const landlord = await createRealUser({ role: 'landlord' });
-      const listing = await insertApprovedListing(landlord.id);
-      await addFavorite(student.id, listing.id);
+    it('devuelve las motos favoritas reales del comprador', async () => {
+      const buyer = await createRealUser({ role: 'buyer' });
+      const seller = await createRealUser({ role: 'seller' });
+      const moto = await insertApprovedMotorcycle(seller.id);
+      await addFavorite(buyer.id, moto.id);
 
-      const favorites = await listFavorites(student.id);
+      const favorites = await listFavorites(buyer.id);
 
-      expect(favorites.map((l) => l.id)).toContain(listing.id);
+      expect(favorites.map((m) => m.id)).toContain(moto.id);
     });
 
     it('lanza error con statusCode 500 si el repositorio falla', async () => {

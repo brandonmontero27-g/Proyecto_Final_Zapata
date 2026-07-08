@@ -10,6 +10,6 @@ router.use(requireAuth);
 
 router.get('/', list);
 router.post('/', validate(addFavoriteSchema), add);
-router.delete('/:listingId', remove);
+router.delete('/:motorcycleId', remove);
 
 export default router;

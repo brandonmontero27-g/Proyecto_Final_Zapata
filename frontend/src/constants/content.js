@@ -1,112 +1,106 @@
-export const MACOT_TIPS = [
+export const TICO_TIPS = [
   {
     id: "tip-1",
-    title: "Presupuesto Estudioso",
+    title: "Revisa antes de comprar",
     message:
-      "En Ayacucho, el costo promedio de cuartos para estudiantes universitarios varía entre 150 y 350 soles mensuales. ¡Busca alojamientos que incluyan servicios de luz y agua para evitar sorpresas en fin de mes, hermano!",
-    category: "budget"
+      "Antes de cerrar la compra, revisa el motor en frío, el kilometraje real y que no tenga fugas de aceite. Un vendedor serio no tiene problema en dejarte revisar con calma.",
+    category: "inspection"
   },
   {
     id: "tip-2",
-    title: "Cercanía a la UNSCH",
+    title: "Papeles en regla",
     message:
-      "Los barrios de San Blas, Av. Independencia y Belén están a pasos de la Ciudad Universitaria. Ahorrarás mucho en pasajes de mototaxi y podrás volver a casa rápido después de las clases nocturnas de tu facultad.",
-    category: "location"
+      "Verifica que la tarjeta de propiedad esté a nombre del vendedor (o pide el certificado de gravamen) y que la moto no tenga papeletas ni deudas pendientes antes de transferir.",
+    category: "papers"
   },
   {
     id: "tip-3",
-    title: "Seguridad y Tranquilidad",
+    title: "Prueba de manejo",
     message:
-      "¡Tu seguridad es lo primero, wawa! Asegúrate de que las puertas tengan cerraduras confiables, que el barrio sea bien iluminado de noche, y de preferencia pregunta si los dueños de casa viven en el mismo edificio.",
-    category: "safety"
+      "Siempre pide una prueba de manejo corta antes de decidir. Presta atención a los frenos, el embrague y cualquier ruido extraño del motor.",
+    category: "test"
   },
   {
     id: "tip-4",
-    title: "Hábito de Estudio y Descanso",
+    title: "Nueva vs. usada",
     message:
-      "Pregunta a tus futuros compañeros de casa sobre las reglas de convivencia. El ruido excesivo puede perjudicar tu preparación académica. Un espacio kusi (feliz) y silencioso es ideal para tus exámenes finales.",
-    category: "academic"
+      "Una moto nueva trae garantía de fábrica, pero una usada bien mantenida puede ser una gran oportunidad de precio. Compara el costo total (mantenimiento + seguro) antes de decidir.",
+    category: "budget"
   }
 ];
 
 export const TIP_CATEGORY_LABEL = {
-  safety: "Seguridad",
-  budget: "Presupuesto",
-  location: "Zona",
-  academic: "Estudio"
+  inspection: "Inspección",
+  papers: "Papeles",
+  test: "Prueba",
+  budget: "Presupuesto"
 };
 
-export const STUDENT_TESTIMONIALS = [
+export const BUYER_TESTIMONIALS = [
   {
     id: "t-1",
-    studentName: "Rubén Mendoza",
-    faculty: "Ingeniería de Minas",
+    buyerName: "Rubén Mendoza",
+    city: "Lima",
     content:
-      "¡YachakuqWasi me salvó la vida! Gracias a Maki encontré una habitación súper cerca al pabellón de minas a un precio excelente. La verificación de Maki realmente da seguridad.",
+      "Encontré mi Honda CB190R al mejor precio y Tico me ayudó a comparar varias opciones antes de decidir. Proceso rápido y transparente.",
     rating: 5
   },
   {
     id: "t-2",
-    studentName: "Katherin Ccoyllo",
-    faculty: "Educación Inicial",
+    buyerName: "Katherin Ccoyllo",
+    city: "Arequipa",
     content:
-      "Maki me dio el tip de buscar en San Blas porque el barrio es tranquilo y está lleno de fotocopiadoras y restaurantes económicos para estudiantes. ¡Recomendadísimo!",
+      "Tico me dio el tip de siempre pedir prueba de manejo antes de comprar. Gracias a eso evité una moto con problemas de embrague.",
     rating: 5
   },
   {
     id: "t-3",
-    studentName: "Joel Noa",
-    faculty: "Ciencias de la Salud",
+    buyerName: "Joel Noa",
+    city: "Trujillo",
     content:
-      "Estudiar enfermería exige mucho tiempo, por eso busqué con baño propio en Belén. Los consejos de Maki sobre el ruido me ayudaron a elegir un casero muy respetuoso.",
+      "Vendí mi moto usada en menos de una semana. El panel de vendedor es muy fácil de usar y los compradores contactan directo por WhatsApp.",
     rating: 5
   }
 ];
 
-export const NEIGHBORHOODS = ["San Blas", "Av. Independencia", "Belén", "Carmen Alto", "Santa Ana"];
+export const LOCATIONS = ["Lima", "Arequipa", "Trujillo", "Cusco", "Ayacucho", "Chiclayo", "Piura"];
 
-export const TYPE_OPTIONS = [
-  { label: "Todos", value: "" },
-  { label: "Habitación", value: "room" },
-  { label: "Departamento", value: "apartment" },
-  { label: "Compartido", value: "shared" },
-  { label: "Familiar", value: "family" }
+export const CATEGORY_OPTIONS = [
+  { label: "Todas", value: "" },
+  { label: "Scooter", value: "scooter" },
+  { label: "Naked", value: "naked" },
+  { label: "Deportiva", value: "deportiva" },
+  { label: "Enduro", value: "enduro" },
+  { label: "Cub", value: "cub" },
+  { label: "Eléctrica", value: "electrica" }
 ];
 
-export const TYPE_LABEL = { room: "Habitación", apartment: "Departamento", shared: "Compartido", family: "Familiar" };
-
-export const UNSCH_ACADEMIC_MAP = {
-  "Facultad de Ingeniería de Minas, Geología y Metalurgia": [
-    "Ingeniería de Sistemas",
-    "Ingeniería de Minas",
-    "Ingeniería Civil"
-  ],
-  "Facultad de Ingeniería Química y Metalurgia": [
-    "Ingeniería Química",
-    "Ingeniería en Industrias Alimentarias",
-    "Ingeniería Agroindustrial"
-  ],
-  "Facultad de Ciencias de la Salud": ["Medicina Humana", "Enfermería", "Obstetricia"],
-  "Facultad de Ciencias Biológicas": ["Biología", "Farmacia y Bioquímica"],
-  "Facultad de Ciencias Agrarias": ["Agronomía", "Ingeniería Agrícola", "Medicina Veterinaria"],
-  "Facultad de Ciencias Sociales": [
-    "Arqueología e Historia",
-    "Trabajo Social",
-    "Antropología Social",
-    "Ciencias de la Comunicación"
-  ],
-  "Facultad de Ciencias de la Educación": [
-    "Educación Inicial",
-    "Educación Primaria",
-    "Educación Secundaria",
-    "Educación Física"
-  ],
-  "Facultad de Derecho y Ciencias Políticas": ["Derecho"],
-  "Facultad de Ciencias Económicas, Administrativas y Contables": [
-    "Administración de Empresas",
-    "Contabilidad",
-    "Economía"
-  ]
+export const CATEGORY_LABEL = {
+  scooter: "Scooter",
+  naked: "Naked",
+  deportiva: "Deportiva",
+  enduro: "Enduro",
+  cub: "Cub",
+  electrica: "Eléctrica"
 };
 
-export const FACULTIES = Object.keys(UNSCH_ACADEMIC_MAP);
+export const CONDITION_OPTIONS = [
+  { label: "Todos", value: "" },
+  { label: "Nueva", value: "new" },
+  { label: "Usada", value: "used" }
+];
+
+export const CONDITION_LABEL = { new: "Nueva", used: "Usada" };
+
+export const FUEL_TYPE_OPTIONS = [
+  { label: "Gasolina", value: "gasolina" },
+  { label: "Eléctrica", value: "electrica" },
+  { label: "Híbrida", value: "hibrida" }
+];
+
+export const TRANSMISSION_OPTIONS = [
+  { label: "Manual", value: "manual" },
+  { label: "Automática", value: "automatica" }
+];
+
+export const BRANDS = ["Honda", "Yamaha", "Bajaj", "KTM", "Suzuki", "TVS", "Zongshen", "Kawasaki"];

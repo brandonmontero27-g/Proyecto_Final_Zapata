@@ -1,17 +1,17 @@
 import { supabaseAdmin } from '../config/supabase.js';
 
-export function insertFavorite(userId, listingId) {
-  return supabaseAdmin.from('favorites').insert({ user_id: userId, listing_id: listingId }).select().single();
+export function insertFavorite(userId, motorcycleId) {
+  return supabaseAdmin.from('favorites').insert({ user_id: userId, motorcycle_id: motorcycleId }).select().single();
 }
 
-export function deleteFavorite(userId, listingId) {
-  return supabaseAdmin.from('favorites').delete().eq('user_id', userId).eq('listing_id', listingId);
+export function deleteFavorite(userId, motorcycleId) {
+  return supabaseAdmin.from('favorites').delete().eq('user_id', userId).eq('motorcycle_id', motorcycleId);
 }
 
 export function findFavoritesByUser(userId) {
   return supabaseAdmin
     .from('favorites')
-    .select('listing_id, housing_listings(*)')
+    .select('motorcycle_id, motorcycles(*)')
     .eq('user_id', userId)
     .order('created_at', { ascending: false });
 }
@@ -20,9 +20,9 @@ export function countFavoritesByUser(userId) {
   return supabaseAdmin.from('favorites').select('*', { count: 'exact', head: true }).eq('user_id', userId);
 }
 
-export function countFavoritesForLandlordListings(landlordId) {
+export function countFavoritesForSellerMotorcycles(sellerId) {
   return supabaseAdmin
     .from('favorites')
-    .select('listing_id, housing_listings!inner(landlord_id)', { count: 'exact', head: true })
-    .eq('housing_listings.landlord_id', landlordId);
+    .select('motorcycle_id, motorcycles!inner(seller_id)', { count: 'exact', head: true })
+    .eq('motorcycles.seller_id', sellerId);
 }

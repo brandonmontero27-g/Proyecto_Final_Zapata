@@ -8,7 +8,7 @@ const router = Router();
 
 router.use(requireAuth);
 
-router.post('/', requireRole('student'), validate(startChatSchema), startChat);
+router.post('/', requireRole('buyer'), validate(startChatSchema), startChat);
 router.get('/', listChats);
 router.get('/:id/messages', getMessages);
 router.post('/:id/messages', validate(sendMessageSchema), sendMessage);

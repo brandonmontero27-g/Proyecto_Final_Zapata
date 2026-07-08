@@ -1,7 +1,7 @@
 import { apiFetch } from "./client.js";
 
-export function startChatRequest(token, landlordId, listingId) {
-  return apiFetch("/chats", { method: "POST", token, body: { landlordId, listingId } });
+export function startChatRequest(token, sellerId, motorcycleId) {
+  return apiFetch("/chats", { method: "POST", token, body: { sellerId, motorcycleId } });
 }
 
 export function listChatsRequest(token) {

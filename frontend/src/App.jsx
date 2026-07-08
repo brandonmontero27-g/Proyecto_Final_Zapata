@@ -2,17 +2,18 @@ import { useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import NavBar from "./components/NavBar.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
-import MakiChat from "./components/MakiChat.jsx";
+import TicoChat from "./components/TicoChat.jsx";
 import AuthModal from "./components/AuthModal.jsx";
 import IntroExperience from "./components/IntroExperience.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
-import ExplorePage from "./pages/ExplorePage.jsx";
+import HomePage from "./pages/HomePage.jsx";
+import CatalogPage from "./pages/CatalogPage.jsx";
 import PublishPage from "./pages/PublishPage.jsx";
 import AdminPage from "./pages/AdminPage.jsx";
 import DashboardPage from "./pages/DashboardPage.jsx";
 import AccountSettingsPage from "./pages/AccountSettingsPage.jsx";
 
-const INTRO_STORAGE_KEY = "yachakuqwasi_intro_seen";
+const INTRO_STORAGE_KEY = "motomarket_intro_seen";
 
 export default function App() {
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -24,16 +25,17 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA] text-[#334155] font-sans selection:bg-guindo selection:text-white">
-      <NavBar onOpenMaki={() => setIsChatOpen(true)} onReplayIntro={() => setShowIntro(true)} />
+    <div className="min-h-screen bg-moto-black text-moto-white font-sans selection:bg-moto-red selection:text-white">
+      <NavBar onOpenTico={() => setIsChatOpen(true)} onReplayIntro={() => setShowIntro(true)} />
       <Routes>
-        <Route path="/" element={<Navigate to="/explorar" replace />} />
-        <Route path="/explorar" element={<ExplorePage />} />
+        <Route path="/" element={<HomePage />} />
+        <Route path="/catalogo" element={<CatalogPage />} />
+        <Route path="/explorar" element={<Navigate to="/catalogo" replace />} />
         <Route path="/login" element={<LoginPage />} />
         <Route
           path="/publicar"
           element={
-            <ProtectedRoute roles={["landlord", "admin"]}>
+            <ProtectedRoute roles={["seller", "admin"]}>
               <PublishPage />
             </ProtectedRoute>
           }
@@ -41,7 +43,7 @@ export default function App() {
         <Route
           path="/portal"
           element={
-            <ProtectedRoute roles={["student", "landlord"]}>
+            <ProtectedRoute roles={["buyer", "seller"]}>
               <DashboardPage />
             </ProtectedRoute>
           }
@@ -62,9 +64,9 @@ export default function App() {
             </ProtectedRoute>
           }
         />
-        <Route path="*" element={<Navigate to="/explorar" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-      <MakiChat open={isChatOpen} onClose={() => setIsChatOpen(false)} />
+      <TicoChat open={isChatOpen} onClose={() => setIsChatOpen(false)} />
       <AuthModal />
       {showIntro && <IntroExperience onComplete={closeIntro} />}
     </div>

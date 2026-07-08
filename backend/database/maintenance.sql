@@ -15,7 +15,7 @@ begin
   truncate table public.chats cascade;
   truncate table public.favorites cascade;
   truncate table public.verification_documents cascade;
-  truncate table public.housing_listings cascade;
+  truncate table public.motorcycles cascade;
   truncate table public.profiles cascade;
 end;
 $$;

@@ -10,8 +10,8 @@ export default function ProtectedRoute({ roles, children }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated]);
 
-  if (!isAuthenticated) return <Navigate to="/explorar" replace />;
-  if (roles && !roles.includes(user.role)) return <Navigate to="/explorar" replace />;
+  if (!isAuthenticated) return <Navigate to="/" replace />;
+  if (roles && !roles.includes(user.role)) return <Navigate to="/" replace />;
 
   return children;
 }

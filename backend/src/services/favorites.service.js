@@ -1,7 +1,7 @@
 import { insertFavorite, deleteFavorite, findFavoritesByUser } from '../repositories/favorites.repository.js';
 
-export async function addFavorite(userId, listingId) {
-  const { data, error } = await insertFavorite(userId, listingId);
+export async function addFavorite(userId, motorcycleId) {
+  const { data, error } = await insertFavorite(userId, motorcycleId);
 
   if (error) {
     const err = new Error(error.message);
@@ -12,8 +12,8 @@ export async function addFavorite(userId, listingId) {
   return data;
 }
 
-export async function removeFavorite(userId, listingId) {
-  const { error } = await deleteFavorite(userId, listingId);
+export async function removeFavorite(userId, motorcycleId) {
+  const { error } = await deleteFavorite(userId, motorcycleId);
 
   if (error) {
     const err = new Error(error.message);
@@ -33,5 +33,5 @@ export async function listFavorites(userId) {
     throw err;
   }
 
-  return data.map((row) => row.housing_listings).filter(Boolean);
+  return data.map((row) => row.motorcycles).filter(Boolean);
 }

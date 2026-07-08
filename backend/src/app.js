@@ -8,10 +8,10 @@ import { requestLogger } from './middlewares/requestLogger.middleware.js';
 import { apiLimiter } from './middlewares/rateLimiter.middleware.js';
 import errorHandler from './middlewares/errorHandler.middleware.js';
 import authRoutes from './routes/auth.routes.js';
-import housingRoutes from './routes/housing.routes.js';
+import motorcyclesRoutes from './routes/motorcycles.routes.js';
 import adminRoutes from './routes/admin.routes.js';
 import chatRoutes from './routes/chat.routes.js';
-import makiRoutes from './routes/maki.routes.js';
+import ticoRoutes from './routes/tico.routes.js';
 import favoritesRoutes from './routes/favorites.routes.js';
 import verificationRoutes from './routes/verification.routes.js';
 import profileRoutes from './routes/profile.routes.js';
@@ -26,7 +26,7 @@ const app = express();
 // Seguridad HTTP
 app.use(helmet());
 
-// Compresion gzip de las respuestas (listados de housings pueden ser grandes)
+// Compresion gzip de las respuestas (catalogos de motos pueden ser grandes)
 app.use(compression());
 
 // CORS restrictivo
@@ -77,17 +77,17 @@ app.get('/api/health', (req, res) => {
 if (process.env.NODE_ENV === 'development') {
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
     explorer: true,
-    customSiteTitle: 'API - Alquileres UNSCH'
+    customSiteTitle: 'API - MotoMarket'
   }));
   logger.info('Swagger disponible en http://localhost:' + process.env.PORT + '/api-docs');
 }
 
 // Rutas de la API
 app.use('/api/auth', authRoutes);
-app.use('/api/housings', housingRoutes);
+app.use('/api/motorcycles', motorcyclesRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/chats', chatRoutes);
-app.use('/api/maki', makiRoutes);
+app.use('/api/tico', ticoRoutes);
 app.use('/api/favoritos', favoritesRoutes);
 app.use('/api/verificacion', verificationRoutes);
 app.use('/api/perfil', profileRoutes);

@@ -11,7 +11,7 @@ function decodeDataUrl(input) {
   return Buffer.from(match ? match[1] : input, 'base64');
 }
 
-export async function uploadHousingImages(housingId, images) {
+export async function uploadMotorcycleImages(motorcycleId, images) {
   if (images.length > MAX_FILES) {
     throw new ValidationError({ images: [`Máximo ${MAX_FILES} fotos por publicación`] });
   }
@@ -40,7 +40,7 @@ export async function uploadHousingImages(housingId, images) {
       .webp({ quality: 82 })
       .toBuffer();
 
-    const path = `${housingId}/${Date.now()}-${i}.webp`;
+    const path = `${motorcycleId}/${Date.now()}-${i}.webp`;
     const url = await uploadImage(path, processed, 'image/webp');
     urls.push(url);
   }

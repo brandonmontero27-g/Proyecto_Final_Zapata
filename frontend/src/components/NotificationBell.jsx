@@ -11,10 +11,10 @@ import {
 const POLL_INTERVAL_MS = 45000;
 
 const TYPE_META = {
-  listing_approved: { icon: ThumbsUp, className: "text-emerald-600 bg-emerald-100" },
-  listing_flagged: { icon: Flag, className: "text-amber-600 bg-amber-100" },
-  listing_suspended: { icon: Ban, className: "text-red-600 bg-red-100" },
-  listing_pending_review: { icon: FileClock, className: "text-sky-600 bg-sky-100" }
+  motorcycle_approved: { icon: ThumbsUp, className: "text-emerald-400 bg-emerald-500/15" },
+  motorcycle_flagged: { icon: Flag, className: "text-amber-400 bg-amber-500/15" },
+  motorcycle_suspended: { icon: Ban, className: "text-red-400 bg-red-500/15" },
+  motorcycle_pending_review: { icon: FileClock, className: "text-sky-400 bg-sky-500/15" }
 };
 
 function timeAgo(isoDate) {
@@ -82,12 +82,12 @@ export default function NotificationBell() {
     <div className="relative" ref={containerRef}>
       <button
         onClick={() => setOpen((prev) => !prev)}
-        className="relative bg-slate-100 hover:bg-slate-200 text-slate-700 p-2.5 rounded-xl transition-all cursor-pointer"
+        className="relative bg-white/5 hover:bg-white/10 text-moto-white p-2.5 rounded-xl transition-all cursor-pointer"
         title="Notificaciones"
       >
-        <Bell className="h-4 w-4 text-guindo" />
+        <Bell className="h-4 w-4 text-moto-red-light" />
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 bg-dorado text-slate-900 text-[9px] min-w-[16px] h-4 px-1 rounded-full font-black flex items-center justify-center shadow-sm">
+          <span className="absolute -top-1 -right-1 bg-moto-red text-white text-[9px] min-w-[16px] h-4 px-1 rounded-full font-black flex items-center justify-center shadow-sm">
             {unreadCount > 9 ? "9+" : unreadCount}
           </span>
         )}
@@ -100,14 +100,14 @@ export default function NotificationBell() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ type: "spring", damping: 25, stiffness: 220 }}
-            className="absolute right-0 mt-2 w-80 max-h-[420px] bg-white rounded-2xl border border-slate-200 shadow-2xl overflow-hidden flex flex-col z-50"
+            className="absolute right-0 mt-2 w-80 max-h-[420px] bg-moto-black-soft rounded-2xl border border-white/10 shadow-2xl overflow-hidden flex flex-col z-50"
           >
-            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 shrink-0">
-              <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider">Notificaciones</h4>
+            <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 shrink-0">
+              <h4 className="text-xs font-black text-moto-white uppercase tracking-wider">Notificaciones</h4>
               {unreadCount > 0 && (
                 <button
                   onClick={handleMarkAllRead}
-                  className="text-[10px] font-bold text-guindo hover:text-guindo-dark cursor-pointer flex items-center gap-1"
+                  className="text-[10px] font-bold text-moto-red-light hover:text-moto-red cursor-pointer flex items-center gap-1"
                 >
                   <CheckCheck className="h-3 w-3" />
                   <span>Marcar todas</span>
@@ -115,30 +115,30 @@ export default function NotificationBell() {
               )}
             </div>
 
-            <div className="flex-1 overflow-y-auto divide-y divide-slate-100">
+            <div className="flex-1 overflow-y-auto divide-y divide-white/10">
               {notifications.length === 0 ? (
-                <p className="text-center text-xs text-slate-400 py-10">No tienes notificaciones.</p>
+                <p className="text-center text-xs text-moto-gray py-10">No tienes notificaciones.</p>
               ) : (
                 notifications.map((n) => {
-                  const meta = TYPE_META[n.type] || TYPE_META.listing_pending_review;
+                  const meta = TYPE_META[n.type] || TYPE_META.motorcycle_pending_review;
                   const Icon = meta.icon;
                   return (
                     <button
                       key={n.id}
                       onClick={() => handleMarkRead(n.id)}
-                      className={`w-full text-left px-4 py-3 flex gap-2.5 items-start transition-colors cursor-pointer hover:bg-slate-50 ${
-                        !n.read_at ? "bg-guindo/5" : ""
+                      className={`w-full text-left px-4 py-3 flex gap-2.5 items-start transition-colors cursor-pointer hover:bg-white/5 ${
+                        !n.read_at ? "bg-moto-red/10" : ""
                       }`}
                     >
                       <span className={`h-7 w-7 rounded-full flex items-center justify-center shrink-0 ${meta.className}`}>
                         <Icon className="h-3.5 w-3.5" />
                       </span>
                       <span className="flex-1 min-w-0">
-                        <span className="text-[11px] font-bold text-slate-800 block truncate">{n.title}</span>
-                        {n.body && <span className="text-[10px] text-slate-500 block truncate">{n.body}</span>}
-                        <span className="text-[9px] text-slate-400 block mt-0.5">{timeAgo(n.created_at)}</span>
+                        <span className="text-[11px] font-bold text-moto-white block truncate">{n.title}</span>
+                        {n.body && <span className="text-[10px] text-moto-gray block truncate">{n.body}</span>}
+                        <span className="text-[9px] text-moto-gray block mt-0.5">{timeAgo(n.created_at)}</span>
                       </span>
-                      {!n.read_at && <span className="h-2 w-2 rounded-full bg-guindo shrink-0 mt-1" />}
+                      {!n.read_at && <span className="h-2 w-2 rounded-full bg-moto-red shrink-0 mt-1" />}
                     </button>
                   );
                 })

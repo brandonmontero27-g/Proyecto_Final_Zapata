@@ -1,32 +1,32 @@
 import {
   countProfiles,
-  countHousings,
+  countMotorcycles,
   countPendingDocuments,
   findPendingDocuments,
   updateDocumentStatus,
   updateProfileVerification,
-  findPendingHousings,
-  updateHousingStatusRecord,
+  findPendingMotorcycles,
+  updateMotorcycleStatusRecord,
   updateProfileBlock,
-  findAllHousingsAdmin,
+  findAllMotorcyclesAdmin,
   findAllProfiles,
   updateProfileRole,
   insertAuditLog,
   findAuditLogs
 } from '../repositories/admin.repository.js';
-import { notifyLandlordOfHousingReview } from './notifications.service.js';
+import { notifySellerOfMotorcycleReview } from './notifications.service.js';
 import logger from '../config/logger.js';
 
 export async function getStats() {
-  const [users, housings, pendingDocs] = await Promise.all([
+  const [users, motorcycles, pendingDocs] = await Promise.all([
     countProfiles(),
-    countHousings(),
+    countMotorcycles(),
     countPendingDocuments()
   ]);
 
   return {
     totalUsers: users.count ?? 0,
-    totalHousings: housings.count ?? 0,
+    totalMotorcycles: motorcycles.count ?? 0,
     pendingDocuments: pendingDocs.count ?? 0
   };
 }
@@ -69,8 +69,8 @@ export async function reviewDocument(docId, { estado, comentario }, actor) {
   return doc;
 }
 
-export async function getPendingHousings() {
-  const { data, error } = await findPendingHousings();
+export async function getPendingMotorcycles() {
+  const { data, error } = await findPendingMotorcycles();
 
   if (error) {
     const err = new Error(error.message);
@@ -81,8 +81,8 @@ export async function getPendingHousings() {
   return data;
 }
 
-export async function updateHousingStatus(housingId, { estado }, actor) {
-  const { data, error } = await updateHousingStatusRecord(housingId, estado);
+export async function updateMotorcycleStatus(motorcycleId, { estado }, actor) {
+  const { data, error } = await updateMotorcycleStatusRecord(motorcycleId, estado);
 
   if (error) {
     const err = new Error(error.message);
@@ -93,23 +93,23 @@ export async function updateHousingStatus(housingId, { estado }, actor) {
   await insertAuditLog({
     userId: actor?.id,
     actorName: actor?.name ?? 'Admin',
-    action: `Moderar anuncio: ${estado}`,
-    details: `Anuncio '${data?.title ?? housingId}' cambiado a estado '${estado}'.`,
-    type: 'listing'
+    action: `Moderar publicación: ${estado}`,
+    details: `Publicación '${data?.title ?? motorcycleId}' cambiada a estado '${estado}'.`,
+    type: 'motorcycle'
   });
 
   try {
     if (data) {
-      await notifyLandlordOfHousingReview({
-        landlordId: data.landlord_id,
-        listingId: data.id,
-        listingTitle: data.title,
+      await notifySellerOfMotorcycleReview({
+        sellerId: data.seller_id,
+        motorcycleId: data.id,
+        motorcycleTitle: data.title,
         estado,
         actorId: actor?.id
       });
     }
   } catch (err) {
-    logger.warn(`No se pudo notificar sobre el anuncio ${housingId}: ${err.message}`);
+    logger.warn(`No se pudo notificar sobre la publicación ${motorcycleId}: ${err.message}`);
   }
 
   return data;
@@ -137,8 +137,8 @@ export async function blockUser(userId, { motivo, dias }, actor) {
   return { message: 'Usuario bloqueado' };
 }
 
-export async function getAllHousingsAdmin() {
-  const { data, error } = await findAllHousingsAdmin();
+export async function getAllMotorcyclesAdmin() {
+  const { data, error } = await findAllMotorcyclesAdmin();
 
   if (error) {
     const err = new Error(error.message);

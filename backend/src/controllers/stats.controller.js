@@ -1,11 +1,11 @@
-import { getStudentStats, getLandlordStats } from '../services/stats.service.js';
+import { getBuyerStats, getSellerStats } from '../services/stats.service.js';
 
-export async function studentStats(req, res) {
-  const stats = await getStudentStats(req.user.id);
+export async function buyerStats(req, res) {
+  const stats = await getBuyerStats(req.user.id);
   res.json(stats);
 }
 
-export async function landlordStats(req, res) {
-  const stats = await getLandlordStats(req.user.id);
+export async function sellerStats(req, res) {
+  const stats = await getSellerStats(req.user.id);
   res.json(stats);
 }

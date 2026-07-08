@@ -12,5 +12,5 @@ export default function LoginPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return <Navigate to="/explorar" replace />;
+  return <Navigate to="/" replace />;
 }

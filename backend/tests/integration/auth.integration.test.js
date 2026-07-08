@@ -9,17 +9,17 @@ afterAll(async () => {
 describe('Auth Integration (Supabase local real)', () => {
   describe('POST /api/auth/login', () => {
     it('debe devolver token real con credenciales validas', async () => {
-      const user = await createRealUser({ role: 'student' });
+      const user = await createRealUser({ role: 'buyer' });
 
       const res = await request(app).post('/api/auth/login').send({ email: user.email, password: user.password });
 
       expect(res.status).toBe(200);
       expect(res.body).toHaveProperty('token');
-      expect(res.body.user.role).toBe('student');
+      expect(res.body.user.role).toBe('buyer');
     });
 
     it('debe rechazar credenciales invalidas', async () => {
-      const user = await createRealUser({ role: 'student' });
+      const user = await createRealUser({ role: 'buyer' });
 
       const res = await request(app).post('/api/auth/login').send({ email: user.email, password: 'ContraseniaMala1!' });
 
@@ -35,14 +35,14 @@ describe('Auth Integration (Supabase local real)', () => {
   });
 
   describe('POST /api/auth/register', () => {
-    it('debe registrar un nuevo estudiante real', async () => {
+    it('debe registrar un nuevo comprador real', async () => {
       const email = uniqueEmail('integration-register');
 
       const res = await request(app).post('/api/auth/register').send({
-        name: 'Nuevo Estudiante Integration',
+        name: 'Nuevo Comprador Integration',
         email,
         password: 'SecurePass123!',
-        role: 'student'
+        role: 'buyer'
       });
 
       expect(res.status).toBe(201);
@@ -51,7 +51,7 @@ describe('Auth Integration (Supabase local real)', () => {
     });
 
     it('debe rechazar el registro si el email ya existe', async () => {
-      const user = await createRealUser({ role: 'student' });
+      const user = await createRealUser({ role: 'buyer' });
 
       const res = await request(app)
         .post('/api/auth/register')

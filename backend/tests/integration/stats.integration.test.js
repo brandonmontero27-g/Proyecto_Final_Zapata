@@ -3,15 +3,15 @@ import app from '../../src/app.js';
 import { supabaseAdmin } from '../../src/config/supabase.js';
 import { createRealUser, cleanupCreatedUsers } from '../helpers/testData.js';
 
-const createdListingIds = [];
+const createdMotorcycleIds = [];
 const createdChatIds = [];
 
 afterAll(async () => {
   for (const id of createdChatIds.splice(0)) {
     await supabaseAdmin.from('chats').delete().eq('id', id).catch?.(() => {});
   }
-  for (const id of createdListingIds.splice(0)) {
-    await supabaseAdmin.from('housing_listings').delete().eq('id', id).catch?.(() => {});
+  for (const id of createdMotorcycleIds.splice(0)) {
+    await supabaseAdmin.from('motorcycles').delete().eq('id', id).catch?.(() => {});
   }
   await cleanupCreatedUsers();
 });
@@ -21,90 +21,92 @@ async function loginAndGetToken(user) {
   return res.body.token;
 }
 
-async function createListing(landlordId, status = 'approved') {
+async function createMotorcycle(sellerId, status = 'approved') {
   const { data } = await supabaseAdmin
-    .from('housing_listings')
+    .from('motorcycles')
     .insert({
-      landlord_id: landlordId,
-      title: 'Habitacion integration stats',
-      price_pen: 250,
-      distance_to_unsch_minutes: 5,
-      neighborhood: 'San Blas',
-      address: 'Jr. Stats Integration 1',
+      seller_id: sellerId,
+      title: 'Moto integration stats',
+      brand: 'Honda',
+      model: 'CB1',
+      year: 2020,
+      displacement_cc: 150,
+      price: 6000,
+      location: 'San Blas',
       contact_phone: '900000000',
       status
     })
     .select()
     .single();
-  createdListingIds.push(data.id);
+  createdMotorcycleIds.push(data.id);
   return data;
 }
 
 describe('Stats Integration (Supabase local real)', () => {
-  it('GET /api/stats/estudiante devuelve conteos reales de favoritos y chats', async () => {
-    const student = await createRealUser({ role: 'student' });
-    const landlord = await createRealUser({ role: 'landlord' });
-    const studentToken = await loginAndGetToken(student);
-    const listing = await createListing(landlord.id);
+  it('GET /api/stats/comprador devuelve conteos reales de favoritos y chats', async () => {
+    const buyer = await createRealUser({ role: 'buyer' });
+    const seller = await createRealUser({ role: 'seller' });
+    const buyerToken = await loginAndGetToken(buyer);
+    const moto = await createMotorcycle(seller.id);
 
     await request(app)
       .post('/api/favoritos')
-      .set('Authorization', `Bearer ${studentToken}`)
-      .send({ listingId: listing.id });
+      .set('Authorization', `Bearer ${buyerToken}`)
+      .send({ motorcycleId: moto.id });
 
     const chatRes = await request(app)
       .post('/api/chats')
-      .set('Authorization', `Bearer ${studentToken}`)
-      .send({ landlordId: landlord.id, listingId: listing.id });
+      .set('Authorization', `Bearer ${buyerToken}`)
+      .send({ sellerId: seller.id, motorcycleId: moto.id });
     createdChatIds.push(chatRes.body.id);
 
-    const res = await request(app).get('/api/stats/estudiante').set('Authorization', `Bearer ${studentToken}`);
+    const res = await request(app).get('/api/stats/comprador').set('Authorization', `Bearer ${buyerToken}`);
 
     expect(res.status).toBe(200);
     expect(res.body.savedFavorites).toBe(1);
     expect(res.body.activeChats).toBe(1);
   });
 
-  it('GET /api/stats/arrendador devuelve conteos reales de anuncios, favoritos recibidos y contactos', async () => {
-    const landlord = await createRealUser({ role: 'landlord' });
-    const student = await createRealUser({ role: 'student' });
-    const landlordToken = await loginAndGetToken(landlord);
-    const studentToken = await loginAndGetToken(student);
+  it('GET /api/stats/vendedor devuelve conteos reales de anuncios, favoritos recibidos y contactos', async () => {
+    const seller = await createRealUser({ role: 'seller' });
+    const buyer = await createRealUser({ role: 'buyer' });
+    const sellerToken = await loginAndGetToken(seller);
+    const buyerToken = await loginAndGetToken(buyer);
 
-    const approved = await createListing(landlord.id, 'approved');
-    await createListing(landlord.id, 'pending');
+    const approved = await createMotorcycle(seller.id, 'approved');
+    await createMotorcycle(seller.id, 'pending');
 
     await request(app)
       .post('/api/favoritos')
-      .set('Authorization', `Bearer ${studentToken}`)
-      .send({ listingId: approved.id });
+      .set('Authorization', `Bearer ${buyerToken}`)
+      .send({ motorcycleId: approved.id });
 
     const chatRes = await request(app)
       .post('/api/chats')
-      .set('Authorization', `Bearer ${studentToken}`)
-      .send({ landlordId: landlord.id, listingId: approved.id });
+      .set('Authorization', `Bearer ${buyerToken}`)
+      .send({ sellerId: seller.id, motorcycleId: approved.id });
     createdChatIds.push(chatRes.body.id);
 
-    const res = await request(app).get('/api/stats/arrendador').set('Authorization', `Bearer ${landlordToken}`);
+    const res = await request(app).get('/api/stats/vendedor').set('Authorization', `Bearer ${sellerToken}`);
 
     expect(res.status).toBe(200);
-    expect(res.body.totalListings).toBe(2);
-    expect(res.body.listingsByStatus.approved).toBe(1);
-    expect(res.body.listingsByStatus.pending).toBe(1);
+    expect(res.body.totalMotorcycles).toBe(2);
+    expect(res.body.motorcyclesByStatus.approved).toBe(1);
+    expect(res.body.motorcyclesByStatus.pending).toBe(1);
     expect(res.body.favoritesReceived).toBe(1);
     expect(res.body.contactsReceived).toBe(1);
   });
 
-  it('un estudiante no puede pedir /api/stats/arrendador (403)', async () => {
-    const student = await createRealUser({ role: 'student' });
-    const token = await loginAndGetToken(student);
+  it('un comprador no puede pedir /api/stats/vendedor (403)', async () => {
+    const buyer = await createRealUser({ role: 'buyer' });
+    const token = await loginAndGetToken(buyer);
 
-    const res = await request(app).get('/api/stats/arrendador').set('Authorization', `Bearer ${token}`);
+    const res = await request(app).get('/api/stats/vendedor').set('Authorization', `Bearer ${token}`);
     expect(res.status).toBe(403);
   });
 
   it('rechaza peticiones sin token', async () => {
-    const res = await request(app).get('/api/stats/estudiante');
+    const res = await request(app).get('/api/stats/comprador');
     expect(res.status).toBe(401);
   });
 });

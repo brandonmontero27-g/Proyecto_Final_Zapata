@@ -2,10 +2,10 @@ import {
   getStats,
   getPendingDocuments,
   reviewDocument,
-  getPendingHousings,
-  updateHousingStatus,
+  getPendingMotorcycles,
+  updateMotorcycleStatus,
   blockUser,
-  getAllHousingsAdmin,
+  getAllMotorcyclesAdmin,
   getAllUsers,
   setUserRole,
   getAuditLogs
@@ -15,28 +15,30 @@ import { supabaseAdmin } from '../../../src/config/supabase.js';
 import { createRealUser, cleanupCreatedUsers } from '../../helpers/testData.js';
 
 const createdDocIds = [];
-const createdListingIds = [];
+const createdMotorcycleIds = [];
 
 afterAll(async () => {
   for (const id of createdDocIds.splice(0)) {
     await supabaseAdmin.from('verification_documents').delete().eq('id', id).catch?.(() => {});
   }
-  for (const id of createdListingIds.splice(0)) {
-    await supabaseAdmin.from('housing_listings').delete().eq('id', id).catch?.(() => {});
+  for (const id of createdMotorcycleIds.splice(0)) {
+    await supabaseAdmin.from('motorcycles').delete().eq('id', id).catch?.(() => {});
   }
   await cleanupCreatedUsers();
 });
 
-async function insertPendingHousing(landlordId, overrides = {}) {
+async function insertPendingMotorcycle(sellerId, overrides = {}) {
   const { data, error } = await supabaseAdmin
-    .from('housing_listings')
+    .from('motorcycles')
     .insert({
-      landlord_id: landlordId,
-      title: 'Habitacion pendiente de prueba',
-      price_pen: 200,
-      distance_to_unsch_minutes: 5,
-      neighborhood: 'San Blas',
-      address: 'Jr. Pendiente 1',
+      seller_id: sellerId,
+      title: 'Moto pendiente de prueba',
+      brand: 'Honda',
+      model: 'CB1',
+      year: 2020,
+      displacement_cc: 150,
+      price: 6000,
+      location: 'San Blas',
       contact_phone: '900000000',
       status: 'pending',
       ...overrides
@@ -44,7 +46,7 @@ async function insertPendingHousing(landlordId, overrides = {}) {
     .select()
     .single();
   if (error) throw error;
-  createdListingIds.push(data.id);
+  createdMotorcycleIds.push(data.id);
   return data;
 }
 
@@ -53,7 +55,7 @@ describe('Admin Service (Supabase local real)', () => {
     it('el conteo de usuarios sube en 1 real al crear un usuario', async () => {
       const before = await getStats();
 
-      await createRealUser({ role: 'student' });
+      await createRealUser({ role: 'buyer' });
 
       const after = await getStats();
 
@@ -62,18 +64,18 @@ describe('Admin Service (Supabase local real)', () => {
 
     it('usa 0 por defecto si algun conteo viene null/undefined', async () => {
       const originalCountProfiles = adminRepo.countProfiles;
-      const originalCountHousings = adminRepo.countHousings;
+      const originalCountMotorcycles = adminRepo.countMotorcycles;
       const originalCountPending = adminRepo.countPendingDocuments;
       adminRepo.countProfiles = jest.fn().mockResolvedValue({ count: null });
-      adminRepo.countHousings = jest.fn().mockResolvedValue({ count: undefined });
+      adminRepo.countMotorcycles = jest.fn().mockResolvedValue({ count: undefined });
       adminRepo.countPendingDocuments = jest.fn().mockResolvedValue({ count: null });
 
       try {
         const stats = await getStats();
-        expect(stats).toEqual({ totalUsers: 0, totalHousings: 0, pendingDocuments: 0 });
+        expect(stats).toEqual({ totalUsers: 0, totalMotorcycles: 0, pendingDocuments: 0 });
       } finally {
         adminRepo.countProfiles = originalCountProfiles;
-        adminRepo.countHousings = originalCountHousings;
+        adminRepo.countMotorcycles = originalCountMotorcycles;
         adminRepo.countPendingDocuments = originalCountPending;
       }
     });
@@ -81,11 +83,11 @@ describe('Admin Service (Supabase local real)', () => {
 
   describe('getPendingDocuments + reviewDocument', () => {
     it('lista un documento pendiente real y lo aprueba, verificando el perfil', async () => {
-      const student = await createRealUser({ role: 'student' });
+      const buyer = await createRealUser({ role: 'buyer' });
 
       const { data: doc } = await supabaseAdmin
         .from('verification_documents')
-        .insert({ user_id: student.id, doc_url: 'https://example.com/carnet.png', status: 'pending' })
+        .insert({ user_id: buyer.id, doc_url: 'https://example.com/carnet.png', status: 'pending' })
         .select()
         .single();
       createdDocIds.push(doc.id);
@@ -96,24 +98,24 @@ describe('Admin Service (Supabase local real)', () => {
       const reviewed = await reviewDocument(doc.id, { estado: 'approved', comentario: 'Documento valido' });
       expect(reviewed.status).toBe('approved');
 
-      const { data: profile } = await supabaseAdmin.from('profiles').select('*').eq('id', student.id).single();
+      const { data: profile } = await supabaseAdmin.from('profiles').select('*').eq('id', buyer.id).single();
       expect(profile.is_verified).toBe(true);
       expect(profile.verification_status).toBe('approved');
     });
 
     it('rechaza un documento real y actualiza el estado de verificacion del perfil', async () => {
-      const student = await createRealUser({ role: 'student' });
+      const buyer = await createRealUser({ role: 'buyer' });
 
       const { data: doc } = await supabaseAdmin
         .from('verification_documents')
-        .insert({ user_id: student.id, doc_url: 'https://example.com/borroso.png', status: 'pending' })
+        .insert({ user_id: buyer.id, doc_url: 'https://example.com/borroso.png', status: 'pending' })
         .select()
         .single();
       createdDocIds.push(doc.id);
 
       await reviewDocument(doc.id, { estado: 'rejected', comentario: 'Ilegible' });
 
-      const { data: profile } = await supabaseAdmin.from('profiles').select('*').eq('id', student.id).single();
+      const { data: profile } = await supabaseAdmin.from('profiles').select('*').eq('id', buyer.id).single();
       expect(profile.verification_status).toBe('rejected');
       expect(profile.is_verified).toBe(false);
     });
@@ -146,70 +148,70 @@ describe('Admin Service (Supabase local real)', () => {
     });
   });
 
-  describe('getPendingHousings + updateHousingStatus', () => {
-    it('lista una habitacion pendiente real y la aprueba', async () => {
-      const landlord = await createRealUser({ role: 'landlord' });
-      const listing = await insertPendingHousing(landlord.id);
+  describe('getPendingMotorcycles + updateMotorcycleStatus', () => {
+    it('lista una moto pendiente real y la aprueba', async () => {
+      const seller = await createRealUser({ role: 'seller' });
+      const moto = await insertPendingMotorcycle(seller.id);
 
-      const pending = await getPendingHousings();
-      expect(pending.map((l) => l.id)).toContain(listing.id);
+      const pending = await getPendingMotorcycles();
+      expect(pending.map((m) => m.id)).toContain(moto.id);
 
-      const approved = await updateHousingStatus(listing.id, { estado: 'approved' });
+      const approved = await updateMotorcycleStatus(moto.id, { estado: 'approved' });
       expect(approved.status).toBe('approved');
 
-      const { data: fetched } = await supabaseAdmin.from('housing_listings').select('*').eq('id', listing.id).single();
+      const { data: fetched } = await supabaseAdmin.from('motorcycles').select('*').eq('id', moto.id).single();
       expect(fetched.status).toBe('approved');
     });
 
-    it('marca una habitacion como flagged (rechazada)', async () => {
-      const landlord = await createRealUser({ role: 'landlord' });
-      const listing = await insertPendingHousing(landlord.id);
+    it('marca una moto como flagged (rechazada)', async () => {
+      const seller = await createRealUser({ role: 'seller' });
+      const moto = await insertPendingMotorcycle(seller.id);
 
-      const flagged = await updateHousingStatus(listing.id, { estado: 'flagged' });
+      const flagged = await updateMotorcycleStatus(moto.id, { estado: 'flagged' });
       expect(flagged.status).toBe('flagged');
     });
 
     it('lanza error con statusCode 400 si el id no es un uuid valido (error real de Postgres)', async () => {
-      await expect(updateHousingStatus('esto-no-es-un-uuid', { estado: 'approved' })).rejects.toMatchObject({
+      await expect(updateMotorcycleStatus('esto-no-es-un-uuid', { estado: 'approved' })).rejects.toMatchObject({
         statusCode: 400
       });
     });
 
-    it('usa el housingId en los detalles del log si el repositorio no devuelve datos', async () => {
-      const originalFn = adminRepo.updateHousingStatusRecord;
-      adminRepo.updateHousingStatusRecord = jest.fn().mockResolvedValue({ data: null, error: null });
+    it('usa el motorcycleId en los detalles del log si el repositorio no devuelve datos', async () => {
+      const originalFn = adminRepo.updateMotorcycleStatusRecord;
+      adminRepo.updateMotorcycleStatusRecord = jest.fn().mockResolvedValue({ data: null, error: null });
 
       try {
-        const result = await updateHousingStatus('fake-housing-id', { estado: 'approved' });
+        const result = await updateMotorcycleStatus('fake-motorcycle-id', { estado: 'approved' });
         expect(result).toBeNull();
 
         const logs = await getAuditLogs();
-        expect(logs.some((l) => l.details?.includes('fake-housing-id'))).toBe(true);
+        expect(logs.some((l) => l.details?.includes('fake-motorcycle-id'))).toBe(true);
       } finally {
-        adminRepo.updateHousingStatusRecord = originalFn;
+        adminRepo.updateMotorcycleStatusRecord = originalFn;
       }
     });
   });
 
   describe('blockUser', () => {
     it('bloquea a un usuario real calculando la fecha de fin segun los dias', async () => {
-      const student = await createRealUser({ role: 'student' });
+      const buyer = await createRealUser({ role: 'buyer' });
 
-      const result = await blockUser(student.id, { motivo: 'Publicaciones fraudulentas', dias: 7 });
+      const result = await blockUser(buyer.id, { motivo: 'Publicaciones fraudulentas', dias: 7 });
       expect(result).toEqual({ message: 'Usuario bloqueado' });
 
-      const { data: profile } = await supabaseAdmin.from('profiles').select('*').eq('id', student.id).single();
+      const { data: profile } = await supabaseAdmin.from('profiles').select('*').eq('id', buyer.id).single();
       expect(profile.blocked_reason).toBe('Publicaciones fraudulentas');
       expect(profile.blocked_until).toBeTruthy();
     });
 
     it('bloquea a un usuario real de forma permanente cuando no se especifican dias', async () => {
-      const student = await createRealUser({ role: 'student' });
+      const buyer = await createRealUser({ role: 'buyer' });
 
-      const result = await blockUser(student.id, { motivo: 'Spam permanente', dias: null });
+      const result = await blockUser(buyer.id, { motivo: 'Spam permanente', dias: null });
       expect(result).toEqual({ message: 'Usuario bloqueado' });
 
-      const { data: profile } = await supabaseAdmin.from('profiles').select('*').eq('id', student.id).single();
+      const { data: profile } = await supabaseAdmin.from('profiles').select('*').eq('id', buyer.id).single();
       expect(profile.blocked_reason).toBe('Spam permanente');
       expect(profile.blocked_until).toBeNull();
     });
@@ -223,11 +225,11 @@ describe('Admin Service (Supabase local real)', () => {
 
   describe('reviewDocument - Estado Rejected', () => {
     it('rechaza un documento y deja al usuario sin verificar', async () => {
-      const student = await createRealUser({ role: 'student' });
+      const buyer = await createRealUser({ role: 'buyer' });
 
       const { data: doc } = await supabaseAdmin
         .from('verification_documents')
-        .insert({ user_id: student.id, doc_url: 'https://example.com/invalido.png', status: 'pending' })
+        .insert({ user_id: buyer.id, doc_url: 'https://example.com/invalido.png', status: 'pending' })
         .select()
         .single();
       createdDocIds.push(doc.id);
@@ -235,7 +237,7 @@ describe('Admin Service (Supabase local real)', () => {
       const reviewed = await reviewDocument(doc.id, { estado: 'rejected', comentario: 'Documento borroso' });
       expect(reviewed.status).toBe('rejected');
 
-      const { data: profile } = await supabaseAdmin.from('profiles').select('*').eq('id', student.id).single();
+      const { data: profile } = await supabaseAdmin.from('profiles').select('*').eq('id', buyer.id).single();
       expect(profile.verification_status).toBe('rejected');
       expect(profile.is_verified).toBe(false);
     });
@@ -260,54 +262,54 @@ describe('Admin Service (Supabase local real)', () => {
     });
   });
 
-  describe('getPendingHousings - Error Cases', () => {
-    it('maneja error cuando falla la consulta de housing pendientes', async () => {
+  describe('getPendingMotorcycles - Error Cases', () => {
+    it('maneja error cuando falla la consulta de motos pendientes', async () => {
       // Mock para forzar error en el repositorio
-      const originalFn = adminRepo.findPendingHousings;
-      adminRepo.findPendingHousings = jest.fn().mockResolvedValue({
+      const originalFn = adminRepo.findPendingMotorcycles;
+      adminRepo.findPendingMotorcycles = jest.fn().mockResolvedValue({
         data: null,
         error: { message: 'Database connection failed' }
       });
 
       try {
-        await expect(getPendingHousings()).rejects.toMatchObject({
+        await expect(getPendingMotorcycles()).rejects.toMatchObject({
           statusCode: 500
         });
       } finally {
-        adminRepo.findPendingHousings = originalFn;
+        adminRepo.findPendingMotorcycles = originalFn;
       }
     });
   });
 
-  describe('getAllHousingsAdmin', () => {
+  describe('getAllMotorcyclesAdmin', () => {
     it('devuelve todas las publicaciones reales (cualquier estado)', async () => {
-      const landlord = await createRealUser({ role: 'landlord' });
-      const listing = await insertPendingHousing(landlord.id, { title: 'Para listado admin' });
+      const seller = await createRealUser({ role: 'seller' });
+      const moto = await insertPendingMotorcycle(seller.id, { title: 'Para listado admin' });
 
-      const all = await getAllHousingsAdmin();
+      const all = await getAllMotorcyclesAdmin();
 
-      expect(all.map((l) => l.id)).toContain(listing.id);
+      expect(all.map((m) => m.id)).toContain(moto.id);
     });
 
     it('lanza error con statusCode 500 si el repositorio falla', async () => {
-      const originalFn = adminRepo.findAllHousingsAdmin;
-      adminRepo.findAllHousingsAdmin = jest.fn().mockResolvedValue({ data: null, error: { message: 'fail' } });
+      const originalFn = adminRepo.findAllMotorcyclesAdmin;
+      adminRepo.findAllMotorcyclesAdmin = jest.fn().mockResolvedValue({ data: null, error: { message: 'fail' } });
 
       try {
-        await expect(getAllHousingsAdmin()).rejects.toMatchObject({ statusCode: 500 });
+        await expect(getAllMotorcyclesAdmin()).rejects.toMatchObject({ statusCode: 500 });
       } finally {
-        adminRepo.findAllHousingsAdmin = originalFn;
+        adminRepo.findAllMotorcyclesAdmin = originalFn;
       }
     });
   });
 
   describe('getAllUsers', () => {
     it('devuelve todos los perfiles reales', async () => {
-      const student = await createRealUser({ role: 'student' });
+      const buyer = await createRealUser({ role: 'buyer' });
 
       const all = await getAllUsers();
 
-      expect(all.map((u) => u.id)).toContain(student.id);
+      expect(all.map((u) => u.id)).toContain(buyer.id);
     });
 
     it('lanza error con statusCode 500 si el repositorio falla', async () => {
@@ -324,29 +326,29 @@ describe('Admin Service (Supabase local real)', () => {
 
   describe('setUserRole', () => {
     it('actualiza el rol real de un usuario', async () => {
-      const student = await createRealUser({ role: 'student' });
+      const buyer = await createRealUser({ role: 'buyer' });
 
-      const updated = await setUserRole(student.id, 'landlord');
+      const updated = await setUserRole(buyer.id, 'seller');
 
-      expect(updated.role).toBe('landlord');
+      expect(updated.role).toBe('seller');
     });
 
     it('lanza error con statusCode 400 si el id no es un uuid valido (error real de Postgres)', async () => {
-      await expect(setUserRole('esto-no-es-un-uuid', 'landlord')).rejects.toMatchObject({ statusCode: 400 });
+      await expect(setUserRole('esto-no-es-un-uuid', 'seller')).rejects.toMatchObject({ statusCode: 400 });
     });
   });
 
   describe('getAuditLogs', () => {
     it('devuelve el log real generado al aprobar un documento', async () => {
-      const student = await createRealUser({ role: 'student' });
+      const buyer = await createRealUser({ role: 'buyer' });
       const { data: doc } = await supabaseAdmin
         .from('verification_documents')
-        .insert({ user_id: student.id, doc_url: 'https://example.com/audit.png', status: 'pending' })
+        .insert({ user_id: buyer.id, doc_url: 'https://example.com/audit.png', status: 'pending' })
         .select()
         .single();
       createdDocIds.push(doc.id);
 
-      await reviewDocument(doc.id, { estado: 'approved', comentario: 'ok' }, { id: student.id, name: 'Admin Test' });
+      await reviewDocument(doc.id, { estado: 'approved', comentario: 'ok' }, { id: buyer.id, name: 'Admin Test' });
 
       const logs = await getAuditLogs();
 

@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { X, ChevronLeft } from "lucide-react";
-import unschEntranceImg from "../assets/images/unsch_entrance_1782935837751.webp";
-import makiMascot from "../assets/images/maki_hawk_guindo_plomo_1782934231251.jpg";
+import { X, ChevronLeft, Bike, Wallet, MessageCircle } from "lucide-react";
 import embersVideo from "../assets/videos/intro-embers-bg.mp4";
 
 const prefersReducedMotion =
@@ -20,59 +18,24 @@ const STEP_SPRING = prefersReducedMotion
 // desvanece apenas se abre para no competir con el contenido de los pasos.
 const VIDEO_FADE_SECONDS = 1.4;
 
-function MapIcon() {
-  return (
-    <svg viewBox="0 0 48 48" className="h-8 w-8">
-      <path d="M24 5C16.3 5 10 11.3 10 19c0 10.5 14 24 14 24s14-13.5 14-24c0-7.7-6.3-14-14-14z" fill="#FFD700" />
-      <circle cx="24" cy="19" r="6.5" fill="#581212" />
-      <circle cx="24" cy="19" r="2.4" fill="#FFD700" />
-    </svg>
-  );
-}
-
-function BudgetIcon() {
-  return (
-    <svg viewBox="0 0 48 48" className="h-8 w-8">
-      <ellipse cx="24" cy="35" rx="14" ry="4.5" fill="#581212" />
-      <ellipse cx="24" cy="29" rx="14" ry="4.5" fill="#7a1c1c" />
-      <ellipse cx="24" cy="23" rx="14" ry="4.5" fill="#9b2d2d" />
-      <ellipse cx="24" cy="17" rx="14" ry="4.5" fill="#FFD700" />
-      <text x="24" y="20" textAnchor="middle" fontSize="7.5" fontWeight="900" fill="#581212" fontFamily="'JetBrains Mono', monospace">
-        S/.
-      </text>
-    </svg>
-  );
-}
-
-function ChatIcon() {
-  return (
-    <svg viewBox="0 0 48 48" className="h-8 w-8">
-      <rect x="6" y="9" width="36" height="23" rx="8" fill="#FFD700" />
-      <path d="M15 32v7l9-7z" fill="#FFD700" />
-      <circle cx="24" cy="20.5" r="8.5" fill="#581212" />
-      <path d="M19.5 20.5l3 3 6-6.2" stroke="#FFD700" strokeWidth="2.6" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
 const STEPS = [
   {
-    eyebrow: "Ubicación",
-    title: "Busca en el mapa real de Ayacucho",
-    body: "Filtra por barrio y mira a cuántos minutos caminando queda cada cuarto de tu facultad. Los precios aparecen directo sobre el mapa.",
-    Icon: MapIcon
+    eyebrow: "Catálogo real",
+    title: "Filtra por marca, cilindraje y precio",
+    body: "Explora motos nuevas y usadas de verdad, con filtros por marca, modelo, año, cilindraje, precio y estado. Los precios aparecen directo sobre el mapa.",
+    Icon: Bike
   },
   {
     eyebrow: "Presupuesto",
-    title: "Cuadra tus soles del mes",
-    body: "La calculadora reparte alquiler, comida, pasaje y materiales para que sepas si un cuarto realmente te alcanza antes de comprometerte.",
-    Icon: BudgetIcon
+    title: "Compara precios reales del mercado",
+    body: "Revisa el rango de precios por categoría antes de negociar, para saber si una oferta realmente conviene.",
+    Icon: Wallet
   },
   {
-    eyebrow: "Contacto seguro",
-    title: "Habla directo con el dueño, sin intermediarios",
-    body: "Chatea o llama por WhatsApp desde la publicación. Los perfiles verificados por Maki llevan una insignia dorada.",
-    Icon: ChatIcon
+    eyebrow: "Contacto directo",
+    title: "Habla directo con el vendedor",
+    body: "Chatea o contacta por WhatsApp desde la publicación. Las motos verificadas por Tico llevan una insignia especial.",
+    Icon: MessageCircle
   }
 ];
 
@@ -120,14 +83,14 @@ export default function IntroExperience({ onComplete }) {
   const slideOffset = prefersReducedMotion ? 0 : 28;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#140404]">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-moto-black">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#3a0d0d] via-[#280909] to-[#140404]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#2a0606] via-[#160303] to-moto-black" />
         {!prefersReducedMotion && (
           <motion.div
             className="absolute inset-0"
-            initial={{ opacity: 0.9 }}
-            animate={{ opacity: doorsOpen ? 0 : 0.9 }}
+            initial={{ opacity: 0.85 }}
+            animate={{ opacity: doorsOpen ? 0 : 0.85 }}
             transition={{ duration: VIDEO_FADE_SECONDS, ease: "easeOut" }}
           >
             <video
@@ -142,12 +105,8 @@ export default function IntroExperience({ onComplete }) {
             />
           </motion.div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#3a0d0d]/60 via-transparent to-[#140404]/90" />
-        <div className="absolute inset-0 bg-guindo/20 mix-blend-multiply" />
-        <svg viewBox="0 0 400 200" preserveAspectRatio="none" className="absolute bottom-0 w-full h-1/2 opacity-40">
-          <polygon points="0,200 0,120 60,60 130,110 200,40 270,100 330,70 400,130 400,200" fill="#581212" opacity="0.55" />
-          <polygon points="0,200 0,160 90,100 180,150 260,90 340,140 400,110 400,200" fill="#300a0a" opacity="0.8" />
-        </svg>
+        <div className="absolute inset-0 bg-gradient-to-b from-[#2a0606]/60 via-transparent to-moto-black/90" />
+        <div className="absolute inset-0 bg-moto-red/15 mix-blend-multiply" />
       </div>
 
       <button
@@ -159,8 +118,8 @@ export default function IntroExperience({ onComplete }) {
       </button>
 
       <div
-        className="relative w-full max-w-md rounded-[28px] overflow-hidden shadow-2xl border-2 border-dorado/40"
-        style={{ background: "linear-gradient(160deg, #581212 0%, #3a0d0d 60%, #240808 100%)" }}
+        className="relative w-full max-w-md rounded-[28px] overflow-hidden shadow-2xl border-2 border-moto-red/40"
+        style={{ background: "linear-gradient(160deg, #1a0505 0%, #120303 60%, #0a0a0a 100%)" }}
       >
         <div className="absolute inset-0 z-30 pointer-events-none" style={{ perspective: 1400 }} aria-hidden={doorsOpen}>
           <motion.div
@@ -168,39 +127,35 @@ export default function IntroExperience({ onComplete }) {
             style={{
               transformOrigin: "left center",
               backfaceVisibility: "hidden",
-              background: "linear-gradient(135deg, #7a1c1c 0%, #581212 100%)",
-              borderRight: "2px solid rgba(255,215,0,.35)"
+              background: "linear-gradient(135deg, #dc2626 0%, #7f1d1d 100%)",
+              borderRight: "2px solid rgba(255,255,255,.15)"
             }}
             animate={{ rotateY: doorsOpen ? -100 : 0 }}
             transition={DOOR_SPRING}
           >
-            <div className="absolute inset-3 border border-dorado/25 rounded-lg" />
+            <div className="absolute inset-3 border border-white/15 rounded-lg" />
           </motion.div>
           <motion.div
             className="absolute inset-y-0 right-0 w-1/2"
             style={{
               transformOrigin: "right center",
               backfaceVisibility: "hidden",
-              background: "linear-gradient(225deg, #7a1c1c 0%, #581212 100%)",
-              borderLeft: "2px solid rgba(255,215,0,.35)"
+              background: "linear-gradient(225deg, #dc2626 0%, #7f1d1d 100%)",
+              borderLeft: "2px solid rgba(255,255,255,.15)"
             }}
             animate={{ rotateY: doorsOpen ? 100 : 0 }}
             transition={DOOR_SPRING}
           >
-            <div className="absolute inset-3 border border-dorado/25 rounded-lg" />
+            <div className="absolute inset-3 border border-white/15 rounded-lg" />
           </motion.div>
 
-          <motion.svg
-            viewBox="0 0 40 40"
-            className="absolute left-1/2 top-1/2 h-9 w-9 -translate-x-1/2 -translate-y-1/2"
+          <motion.div
+            className="absolute left-1/2 top-1/2 h-14 w-14 -translate-x-1/2 -translate-y-1/2 rounded-full bg-moto-red flex items-center justify-center shadow-lg"
             animate={{ opacity: doorsOpen ? 0 : 1 }}
             transition={{ duration: 0.25 }}
           >
-            <circle cx="20" cy="20" r="10" fill="#FFD700" />
-            {[...Array(8)].map((_, i) => (
-              <rect key={i} x="19" y="2" width="2" height="7" fill="#FFD700" transform={`rotate(${i * 45} 20 20)`} />
-            ))}
-          </motion.svg>
+            <Bike className="h-7 w-7 text-white" />
+          </motion.div>
         </div>
 
         <div className="min-h-[420px] flex flex-col">
@@ -215,25 +170,19 @@ export default function IntroExperience({ onComplete }) {
                   exit={{ opacity: 0, x: -slideOffset }}
                   transition={STEP_SPRING}
                 >
-                  <div className="relative h-56 overflow-hidden">
-                    <img src={unschEntranceImg} alt="Pórtico de ingreso de la UNSCH" className="w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-guindo/25 mix-blend-multiply" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#3a0d0d] via-[#3a0d0d]/25 to-transparent" />
-                    <img
-                      src={makiMascot}
-                      alt="Maki, el halcón consejero"
-                      className="absolute bottom-0 right-6 translate-y-1/3 h-24 w-24 rounded-full border-4 border-dorado shadow-2xl object-cover"
-                    />
+                  <div className="relative h-56 overflow-hidden bg-gradient-to-br from-moto-red-dark via-[#1a0505] to-moto-black flex items-center justify-center">
+                    <Bike className="h-20 w-20 text-white/20" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#1a0505] via-transparent to-transparent" />
                   </div>
-                  <div className="px-7 pt-14 pb-2 text-center space-y-2.5">
-                    <span className="text-[9px] font-black tracking-widest text-dorado uppercase font-mono block">
-                      Portal Universitario · Ayacucho 1677
+                  <div className="px-7 pt-8 pb-2 text-center space-y-2.5">
+                    <span className="text-[9px] font-black tracking-widest text-moto-red-light uppercase font-mono block">
+                      MotoMarket · Compra y venta de motos
                     </span>
                     <h2 className="text-xl font-black text-white tracking-tight leading-snug" style={{ textWrap: "balance" }}>
-                      Allillanchu, futuro vecino de Huamanga
+                      Bienvenido a MotoMarket
                     </h2>
-                    <p className="text-slate-200 text-xs leading-relaxed max-w-xs mx-auto">
-                      Maki, tu halcón consejero, te muestra cómo encontrar cuarto cerca a la UNSCH en 3 pasos.
+                    <p className="text-moto-gray-light text-xs leading-relaxed max-w-xs mx-auto">
+                      Tico, tu asistente virtual, te muestra cómo encontrar tu próxima moto en 3 pasos.
                     </p>
                   </div>
                 </motion.div>
@@ -247,16 +196,16 @@ export default function IntroExperience({ onComplete }) {
                   transition={STEP_SPRING}
                   className="px-7 pt-12 pb-2 text-center space-y-3 min-h-[340px] flex flex-col items-center justify-center"
                 >
-                  <div className="mx-auto h-16 w-16 rounded-2xl bg-white/10 border border-dorado/30 flex items-center justify-center shadow-inner">
-                    <current.Icon />
+                  <div className="mx-auto h-16 w-16 rounded-2xl bg-white/10 border border-moto-red/30 flex items-center justify-center shadow-inner">
+                    <current.Icon className="h-8 w-8 text-moto-red-light" />
                   </div>
-                  <span className="text-[9px] font-black tracking-widest text-dorado uppercase font-mono block">
+                  <span className="text-[9px] font-black tracking-widest text-moto-red-light uppercase font-mono block">
                     Paso {step} · {current.eyebrow}
                   </span>
                   <h3 className="text-lg font-black text-white tracking-tight leading-snug" style={{ textWrap: "balance" }}>
                     {current.title}
                   </h3>
-                  <p className="text-slate-200 text-xs leading-relaxed max-w-xs mx-auto">{current.body}</p>
+                  <p className="text-moto-gray-light text-xs leading-relaxed max-w-xs mx-auto">{current.body}</p>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -265,7 +214,7 @@ export default function IntroExperience({ onComplete }) {
           <div className="px-7 pb-6 pt-4 space-y-4 shrink-0">
             <div className="h-1 rounded-full bg-white/10 overflow-hidden">
               <motion.div
-                className="h-full bg-dorado rounded-full"
+                className="h-full bg-moto-red rounded-full"
                 animate={{ width: `${progress}%` }}
                 transition={{ duration: 0.45, ease: "easeOut" }}
               />
@@ -278,7 +227,7 @@ export default function IntroExperience({ onComplete }) {
                   onClick={() => goTo(i + 1)}
                   aria-label={`Ir al paso ${i + 1}`}
                   className={`h-2 rounded-full transition-all cursor-pointer ${
-                    step === i + 1 ? "w-6 bg-dorado" : "w-2 bg-white/25 hover:bg-white/40"
+                    step === i + 1 ? "w-6 bg-moto-red" : "w-2 bg-white/25 hover:bg-white/40"
                   }`}
                 />
               ))}
@@ -296,9 +245,9 @@ export default function IntroExperience({ onComplete }) {
 
               <button
                 onClick={handleNext}
-                className="flex-1 max-w-[220px] bg-dorado text-[#3a0d0d] py-3 rounded-xl text-xs font-black uppercase tracking-wider shadow-lg hover:brightness-105 active:scale-95 transition-all cursor-pointer"
+                className="flex-1 max-w-[220px] bg-moto-red text-white py-3 rounded-xl text-xs font-black uppercase tracking-wider shadow-lg hover:bg-moto-red-dark active:scale-95 transition-all cursor-pointer"
               >
-                {step === 0 ? "Comenzar" : step === STEPS.length ? "Explorar Habitaciones →" : "Siguiente"}
+                {step === 0 ? "Comenzar" : step === STEPS.length ? "Ver catálogo →" : "Siguiente"}
               </button>
             </div>
           </div>

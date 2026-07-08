@@ -1,34 +1,34 @@
 import { supabaseAdmin } from '../config/supabase.js';
 
-export function findChatByParticipants(studentId, landlordId, listingId) {
+export function findChatByParticipants(buyerId, sellerId, motorcycleId) {
   return supabaseAdmin
     .from('chats')
     .select('*')
-    .eq('student_id', studentId)
-    .eq('landlord_id', landlordId)
-    .eq('listing_id', listingId)
+    .eq('buyer_id', buyerId)
+    .eq('seller_id', sellerId)
+    .eq('motorcycle_id', motorcycleId)
     .maybeSingle();
 }
 
-export function insertChat({ studentId, landlordId, listingId }) {
+export function insertChat({ buyerId, sellerId, motorcycleId }) {
   return supabaseAdmin
     .from('chats')
-    .insert({ student_id: studentId, landlord_id: landlordId, listing_id: listingId })
+    .insert({ buyer_id: buyerId, seller_id: sellerId, motorcycle_id: motorcycleId })
     .select()
     .single();
 }
 
 export function findChatsForUser(userId, role) {
-  const column = role === 'landlord' ? 'landlord_id' : 'student_id';
+  const column = role === 'seller' ? 'seller_id' : 'buyer_id';
   return supabaseAdmin
     .from('chats')
-    .select('*, housing_listings(title)')
+    .select('*, motorcycles(title)')
     .eq(column, userId)
     .order('updated_at', { ascending: false });
 }
 
 export function countChatsForUser(userId, role) {
-  const column = role === 'landlord' ? 'landlord_id' : 'student_id';
+  const column = role === 'seller' ? 'seller_id' : 'buyer_id';
   return supabaseAdmin.from('chats').select('*', { count: 'exact', head: true }).eq(column, userId);
 }
 

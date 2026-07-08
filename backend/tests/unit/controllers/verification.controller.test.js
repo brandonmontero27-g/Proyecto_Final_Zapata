@@ -16,15 +16,15 @@ afterAll(async () => {
 
 describe('Verification Controller (Supabase real)', () => {
   it('submit sube un documento real y responde 201 con { documento }', async () => {
-    const student = await createRealUser({ role: 'student' });
-    const req = { user: { id: student.id }, body: { image: TINY_PNG_BASE64 } };
+    const buyer = await createRealUser({ role: 'buyer' });
+    const req = { user: { id: buyer.id }, body: { image: TINY_PNG_BASE64 } };
     const res = { status: jest.fn().mockReturnThis(), json: jest.fn().mockReturnThis() };
 
     await submit(req, res);
 
     expect(res.status).toHaveBeenCalledWith(201);
     const body = res.json.mock.calls[0][0];
-    expect(body.documento.user_id).toBe(student.id);
+    expect(body.documento.user_id).toBe(buyer.id);
     createdDocIds.push(body.documento.id);
   });
 });

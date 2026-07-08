@@ -3,128 +3,130 @@ import * as chatRepo from '../../../src/repositories/chat.repository.js';
 import { supabaseAdmin } from '../../../src/config/supabase.js';
 import { createRealUser, cleanupCreatedUsers } from '../../helpers/testData.js';
 
-const createdListingIds = [];
+const createdMotorcycleIds = [];
 const createdChatIds = [];
 
 afterAll(async () => {
   for (const id of createdChatIds.splice(0)) {
     await supabaseAdmin.from('chats').delete().eq('id', id).catch?.(() => {});
   }
-  for (const id of createdListingIds.splice(0)) {
-    await supabaseAdmin.from('housing_listings').delete().eq('id', id).catch?.(() => {});
+  for (const id of createdMotorcycleIds.splice(0)) {
+    await supabaseAdmin.from('motorcycles').delete().eq('id', id).catch?.(() => {});
   }
   await cleanupCreatedUsers();
 });
 
-async function createListing(landlordId) {
+async function createMotorcycle(sellerId) {
   const { data } = await supabaseAdmin
-    .from('housing_listings')
+    .from('motorcycles')
     .insert({
-      landlord_id: landlordId,
-      title: 'Habitacion para chat de prueba',
-      price_pen: 250,
-      distance_to_unsch_minutes: 5,
-      neighborhood: 'San Blas',
-      address: 'Jr. Chat 1',
+      seller_id: sellerId,
+      title: 'Moto para chat de prueba',
+      brand: 'Honda',
+      model: 'CB1',
+      year: 2020,
+      displacement_cc: 150,
+      price: 6000,
+      location: 'San Blas',
       contact_phone: '900000000',
       status: 'approved'
     })
     .select()
     .single();
-  createdListingIds.push(data.id);
+  createdMotorcycleIds.push(data.id);
   return data;
 }
 
 describe('Chat Service (Supabase local real)', () => {
-  it('crea un chat real entre estudiante y arrendador, y reutiliza el mismo si ya existe', async () => {
-    const student = await createRealUser({ role: 'student' });
-    const landlord = await createRealUser({ role: 'landlord' });
-    const listing = await createListing(landlord.id);
+  it('crea un chat real entre comprador y vendedor, y reutiliza el mismo si ya existe', async () => {
+    const buyer = await createRealUser({ role: 'buyer' });
+    const seller = await createRealUser({ role: 'seller' });
+    const moto = await createMotorcycle(seller.id);
 
-    const chat = await startChat(student.id, { landlordId: landlord.id, listingId: listing.id });
+    const chat = await startChat(buyer.id, { sellerId: seller.id, motorcycleId: moto.id });
     createdChatIds.push(chat.id);
 
-    expect(chat.student_id).toBe(student.id);
-    expect(chat.landlord_id).toBe(landlord.id);
+    expect(chat.buyer_id).toBe(buyer.id);
+    expect(chat.seller_id).toBe(seller.id);
 
-    const sameChat = await startChat(student.id, { landlordId: landlord.id, listingId: listing.id });
+    const sameChat = await startChat(buyer.id, { sellerId: seller.id, motorcycleId: moto.id });
     expect(sameChat.id).toBe(chat.id);
   });
 
-  it('lista los chats reales de un estudiante y de un arrendador', async () => {
-    const student = await createRealUser({ role: 'student' });
-    const landlord = await createRealUser({ role: 'landlord' });
-    const listing = await createListing(landlord.id);
-    const chat = await startChat(student.id, { landlordId: landlord.id, listingId: listing.id });
+  it('lista los chats reales de un comprador y de un vendedor', async () => {
+    const buyer = await createRealUser({ role: 'buyer' });
+    const seller = await createRealUser({ role: 'seller' });
+    const moto = await createMotorcycle(seller.id);
+    const chat = await startChat(buyer.id, { sellerId: seller.id, motorcycleId: moto.id });
     createdChatIds.push(chat.id);
 
-    const studentChats = await listChatsForUser(student.id, 'student');
-    expect(studentChats.map((c) => c.id)).toContain(chat.id);
+    const buyerChats = await listChatsForUser(buyer.id, 'buyer');
+    expect(buyerChats.map((c) => c.id)).toContain(chat.id);
 
-    const landlordChats = await listChatsForUser(landlord.id, 'landlord');
-    expect(landlordChats.map((c) => c.id)).toContain(chat.id);
+    const sellerChats = await listChatsForUser(seller.id, 'seller');
+    expect(sellerChats.map((c) => c.id)).toContain(chat.id);
   });
 
   it('envia un mensaje real y lo puede leer cualquiera de los dos participantes', async () => {
-    const student = await createRealUser({ role: 'student' });
-    const landlord = await createRealUser({ role: 'landlord' });
-    const listing = await createListing(landlord.id);
-    const chat = await startChat(student.id, { landlordId: landlord.id, listingId: listing.id });
+    const buyer = await createRealUser({ role: 'buyer' });
+    const seller = await createRealUser({ role: 'seller' });
+    const moto = await createMotorcycle(seller.id);
+    const chat = await startChat(buyer.id, { sellerId: seller.id, motorcycleId: moto.id });
     createdChatIds.push(chat.id);
 
-    const message = await sendMessage(chat.id, { id: student.id, role: 'student' }, 'Hola, sigue disponible?');
-    expect(message.sender).toBe('student');
+    const message = await sendMessage(chat.id, { id: buyer.id, role: 'buyer' }, 'Hola, sigue disponible?');
+    expect(message.sender).toBe('buyer');
     expect(message.text).toBe('Hola, sigue disponible?');
 
-    const messagesForLandlord = await getMessages(chat.id, { id: landlord.id, role: 'landlord' });
-    expect(messagesForLandlord.map((m) => m.id)).toContain(message.id);
+    const messagesForSeller = await getMessages(chat.id, { id: seller.id, role: 'seller' });
+    expect(messagesForSeller.map((m) => m.id)).toContain(message.id);
   });
 
   it('lanza 403 si un usuario que no participa intenta leer los mensajes', async () => {
-    const student = await createRealUser({ role: 'student' });
-    const landlord = await createRealUser({ role: 'landlord' });
-    const intruso = await createRealUser({ role: 'student' });
-    const listing = await createListing(landlord.id);
-    const chat = await startChat(student.id, { landlordId: landlord.id, listingId: listing.id });
+    const buyer = await createRealUser({ role: 'buyer' });
+    const seller = await createRealUser({ role: 'seller' });
+    const intruso = await createRealUser({ role: 'buyer' });
+    const moto = await createMotorcycle(seller.id);
+    const chat = await startChat(buyer.id, { sellerId: seller.id, motorcycleId: moto.id });
     createdChatIds.push(chat.id);
 
-    await expect(getMessages(chat.id, { id: intruso.id, role: 'student' })).rejects.toMatchObject({
+    await expect(getMessages(chat.id, { id: intruso.id, role: 'buyer' })).rejects.toMatchObject({
       statusCode: 403
     });
   });
 
   it('lanza 404 si el chat no existe', async () => {
     await expect(
-      getMessages('00000000-0000-0000-0000-000000000000', { id: 'x', role: 'student' })
+      getMessages('00000000-0000-0000-0000-000000000000', { id: 'x', role: 'buyer' })
     ).rejects.toMatchObject({ statusCode: 404 });
   });
 
   it('sendMessage tambien lanza 404 si el chat no existe', async () => {
     await expect(
-      sendMessage('00000000-0000-0000-0000-000000000000', { id: 'x', role: 'student' }, 'hola')
+      sendMessage('00000000-0000-0000-0000-000000000000', { id: 'x', role: 'buyer' }, 'hola')
     ).rejects.toMatchObject({ statusCode: 404 });
   });
 
-  it('lanza 400 real si landlordId no existe (violacion de FK en Postgres)', async () => {
-    const student = await createRealUser({ role: 'student' });
-    const landlord = await createRealUser({ role: 'landlord' });
-    const listing = await createListing(landlord.id);
+  it('lanza 400 real si sellerId no existe (violacion de FK en Postgres)', async () => {
+    const buyer = await createRealUser({ role: 'buyer' });
+    const seller = await createRealUser({ role: 'seller' });
+    const moto = await createMotorcycle(seller.id);
 
     await expect(
-      startChat(student.id, { landlordId: '00000000-0000-0000-0000-000000000000', listingId: listing.id })
+      startChat(buyer.id, { sellerId: '00000000-0000-0000-0000-000000000000', motorcycleId: moto.id })
     ).rejects.toMatchObject({ statusCode: 400 });
   });
 
-  it('rechaza el envio de mensaje si el participante no es student ni landlord (ej. admin colado como landlordId)', async () => {
-    const student = await createRealUser({ role: 'student' });
+  it('rechaza el envio de mensaje si el participante no es buyer ni seller (ej. admin colado como sellerId)', async () => {
+    const buyer = await createRealUser({ role: 'buyer' });
     const admin = await createRealUser({ role: 'admin' });
-    const otherLandlord = await createRealUser({ role: 'landlord' });
-    const listing = await createListing(otherLandlord.id);
+    const otherSeller = await createRealUser({ role: 'seller' });
+    const moto = await createMotorcycle(otherSeller.id);
 
-    // Se fuerza un chat cuyo "landlord_id" en realidad apunta a un admin,
+    // Se fuerza un chat cuyo "seller_id" en realidad apunta a un admin,
     // para ejercitar la validacion de rol en sendMessage (linea normalmente
-    // inalcanzable si solo se usan landlords reales).
-    const chat = await startChat(student.id, { landlordId: admin.id, listingId: listing.id });
+    // inalcanzable si solo se usan sellers reales).
+    const chat = await startChat(buyer.id, { sellerId: admin.id, motorcycleId: moto.id });
     createdChatIds.push(chat.id);
 
     await expect(sendMessage(chat.id, { id: admin.id, role: 'admin' }, 'hola')).rejects.toMatchObject({
@@ -133,20 +135,20 @@ describe('Chat Service (Supabase local real)', () => {
   });
 
   it('lista chats vacio para un usuario sin chats', async () => {
-    const newStudent = await createRealUser({ role: 'student' });
-    const chats = await listChatsForUser(newStudent.id, 'student');
+    const newBuyer = await createRealUser({ role: 'buyer' });
+    const chats = await listChatsForUser(newBuyer.id, 'buyer');
     expect(Array.isArray(chats)).toBe(true);
   });
 
   it('envia mensaje y actualiza el last_message del chat', async () => {
-    const student = await createRealUser({ role: 'student' });
-    const landlord = await createRealUser({ role: 'landlord' });
-    const listing = await createListing(landlord.id);
-    const chat = await startChat(student.id, { landlordId: landlord.id, listingId: listing.id });
+    const buyer = await createRealUser({ role: 'buyer' });
+    const seller = await createRealUser({ role: 'seller' });
+    const moto = await createMotorcycle(seller.id);
+    const chat = await startChat(buyer.id, { sellerId: seller.id, motorcycleId: moto.id });
     createdChatIds.push(chat.id);
 
     const messageText = 'Mensaje de prueba';
-    await sendMessage(chat.id, { id: student.id, role: 'student' }, messageText);
+    await sendMessage(chat.id, { id: buyer.id, role: 'buyer' }, messageText);
 
     const { data: updatedChat } = await supabaseAdmin
       .from('chats')
@@ -158,15 +160,15 @@ describe('Chat Service (Supabase local real)', () => {
   });
 
   it('lanza 403 Forbidden si usuario intenta enviar mensaje en chat donde no participa', async () => {
-    const student = await createRealUser({ role: 'student' });
-    const landlord = await createRealUser({ role: 'landlord' });
-    const intruso = await createRealUser({ role: 'student' });
-    const listing = await createListing(landlord.id);
-    const chat = await startChat(student.id, { landlordId: landlord.id, listingId: listing.id });
+    const buyer = await createRealUser({ role: 'buyer' });
+    const seller = await createRealUser({ role: 'seller' });
+    const intruso = await createRealUser({ role: 'buyer' });
+    const moto = await createMotorcycle(seller.id);
+    const chat = await startChat(buyer.id, { sellerId: seller.id, motorcycleId: moto.id });
     createdChatIds.push(chat.id);
 
     await expect(
-      sendMessage(chat.id, { id: intruso.id, role: 'student' }, 'Soy intruso')
+      sendMessage(chat.id, { id: intruso.id, role: 'buyer' }, 'Soy intruso')
     ).rejects.toMatchObject({ statusCode: 403 });
   });
 
@@ -178,7 +180,7 @@ describe('Chat Service (Supabase local real)', () => {
     });
 
     try {
-      await expect(listChatsForUser('test-user-id', 'student')).rejects.toMatchObject({
+      await expect(listChatsForUser('test-user-id', 'buyer')).rejects.toMatchObject({
         statusCode: 500
       });
     } finally {
@@ -187,10 +189,10 @@ describe('Chat Service (Supabase local real)', () => {
   });
 
   it('lanza error 500 cuando getMessages falla al buscar los mensajes', async () => {
-    const student = await createRealUser({ role: 'student' });
-    const landlord = await createRealUser({ role: 'landlord' });
-    const listing = await createListing(landlord.id);
-    const chat = await startChat(student.id, { landlordId: landlord.id, listingId: listing.id });
+    const buyer = await createRealUser({ role: 'buyer' });
+    const seller = await createRealUser({ role: 'seller' });
+    const moto = await createMotorcycle(seller.id);
+    const chat = await startChat(buyer.id, { sellerId: seller.id, motorcycleId: moto.id });
     createdChatIds.push(chat.id);
 
     const originalFn = chatRepo.findMessagesByChat;
@@ -200,7 +202,7 @@ describe('Chat Service (Supabase local real)', () => {
     });
 
     try {
-      await expect(getMessages(chat.id, { id: student.id, role: 'student' })).rejects.toMatchObject({
+      await expect(getMessages(chat.id, { id: buyer.id, role: 'buyer' })).rejects.toMatchObject({
         statusCode: 500
       });
     } finally {
@@ -209,10 +211,10 @@ describe('Chat Service (Supabase local real)', () => {
   });
 
   it('lanza error 400 cuando sendMessage falla al insertar el mensaje', async () => {
-    const student = await createRealUser({ role: 'student' });
-    const landlord = await createRealUser({ role: 'landlord' });
-    const listing = await createListing(landlord.id);
-    const chat = await startChat(student.id, { landlordId: landlord.id, listingId: listing.id });
+    const buyer = await createRealUser({ role: 'buyer' });
+    const seller = await createRealUser({ role: 'seller' });
+    const moto = await createMotorcycle(seller.id);
+    const chat = await startChat(buyer.id, { sellerId: seller.id, motorcycleId: moto.id });
     createdChatIds.push(chat.id);
 
     const originalFn = chatRepo.insertMessage;
@@ -222,7 +224,7 @@ describe('Chat Service (Supabase local real)', () => {
     });
 
     try {
-      await expect(sendMessage(chat.id, { id: student.id, role: 'student' }, 'test')).rejects.toMatchObject({
+      await expect(sendMessage(chat.id, { id: buyer.id, role: 'buyer' }, 'test')).rejects.toMatchObject({
         statusCode: 400
       });
     } finally {

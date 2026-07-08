@@ -2,10 +2,10 @@ import {
   getStats,
   getPendingDocuments,
   reviewDocument,
-  getPendingHousings,
-  updateHousingStatus,
+  getPendingMotorcycles,
+  updateMotorcycleStatus,
   blockUser,
-  getAllHousingsAdmin,
+  getAllMotorcyclesAdmin,
   getAllUsers,
   setUserRole,
   getAuditLogs
@@ -24,13 +24,13 @@ export async function reviewDoc(req, res) {
   res.json({ documento });
 }
 
-export async function pendingHousings(req, res) {
-  res.json(await getPendingHousings());
+export async function pendingMotorcycles(req, res) {
+  res.json(await getPendingMotorcycles());
 }
 
-export async function reviewHousing(req, res) {
-  const listing = await updateHousingStatus(req.params.id, req.body, req.user);
-  res.json({ listing });
+export async function reviewMotorcycle(req, res) {
+  const moto = await updateMotorcycleStatus(req.params.id, req.body, req.user);
+  res.json({ moto });
 }
 
 export async function block(req, res) {
@@ -38,8 +38,8 @@ export async function block(req, res) {
   res.json(result);
 }
 
-export async function allHousings(req, res) {
-  res.json(await getAllHousingsAdmin());
+export async function allMotorcycles(req, res) {
+  res.json(await getAllMotorcyclesAdmin());
 }
 
 export async function allUsers(req, res) {

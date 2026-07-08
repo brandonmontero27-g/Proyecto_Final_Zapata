@@ -6,11 +6,11 @@ import { createRealUser, cleanupCreatedUsers } from '../helpers/testData.js';
 const TINY_PNG_BASE64 =
   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=';
 
-const createdListingIds = [];
+const createdMotorcycleIds = [];
 
 afterAll(async () => {
-  for (const id of createdListingIds.splice(0)) {
-    await supabaseAdmin.from('housing_listings').delete().eq('id', id).catch?.(() => {});
+  for (const id of createdMotorcycleIds.splice(0)) {
+    await supabaseAdmin.from('motorcycles').delete().eq('id', id).catch?.(() => {});
   }
   await cleanupCreatedUsers();
 });
@@ -20,33 +20,35 @@ async function loginAndGetToken(user) {
   return res.body.token;
 }
 
-async function createListing(landlordId) {
+async function createMotorcycle(sellerId) {
   const { data } = await supabaseAdmin
-    .from('housing_listings')
+    .from('motorcycles')
     .insert({
-      landlord_id: landlordId,
-      title: 'Habitacion para fotos integration',
-      price_pen: 250,
-      distance_to_unsch_minutes: 5,
-      neighborhood: 'San Blas',
-      address: 'Jr. Fotos 1',
+      seller_id: sellerId,
+      title: 'Moto para fotos integration',
+      brand: 'Honda',
+      model: 'CB1',
+      year: 2020,
+      displacement_cc: 150,
+      price: 6000,
+      location: 'San Blas',
       contact_phone: '900000000',
       status: 'pending'
     })
     .select()
     .single();
-  createdListingIds.push(data.id);
+  createdMotorcycleIds.push(data.id);
   return data;
 }
 
-describe('Housing Images Integration (Supabase Storage real)', () => {
-  it('el dueño (landlord) puede subir fotos a su propia publicacion', async () => {
-    const landlord = await createRealUser({ role: 'landlord' });
-    const token = await loginAndGetToken(landlord);
-    const listing = await createListing(landlord.id);
+describe('Motorcycle Images Integration (Supabase Storage real)', () => {
+  it('el dueño (seller) puede subir fotos a su propia publicacion', async () => {
+    const seller = await createRealUser({ role: 'seller' });
+    const token = await loginAndGetToken(seller);
+    const moto = await createMotorcycle(seller.id);
 
     const res = await request(app)
-      .post(`/api/housings/${listing.id}/imagenes`)
+      .post(`/api/motorcycles/${moto.id}/imagenes`)
       .set('Authorization', `Bearer ${token}`)
       .send({ images: [TINY_PNG_BASE64] });
 
@@ -56,27 +58,27 @@ describe('Housing Images Integration (Supabase Storage real)', () => {
   });
 
   it('un admin puede subir fotos a la publicacion de otro', async () => {
-    const landlord = await createRealUser({ role: 'landlord' });
+    const seller = await createRealUser({ role: 'seller' });
     const admin = await createRealUser({ role: 'admin' });
     const token = await loginAndGetToken(admin);
-    const listing = await createListing(landlord.id);
+    const moto = await createMotorcycle(seller.id);
 
     const res = await request(app)
-      .post(`/api/housings/${listing.id}/imagenes`)
+      .post(`/api/motorcycles/${moto.id}/imagenes`)
       .set('Authorization', `Bearer ${token}`)
       .send({ images: [TINY_PNG_BASE64] });
 
     expect(res.status).toBe(200);
   });
 
-  it('un arrendador NO puede subir fotos a la publicacion de otro arrendador (403)', async () => {
-    const owner = await createRealUser({ role: 'landlord' });
-    const intruso = await createRealUser({ role: 'landlord' });
+  it('un vendedor NO puede subir fotos a la publicacion de otro vendedor (403)', async () => {
+    const owner = await createRealUser({ role: 'seller' });
+    const intruso = await createRealUser({ role: 'seller' });
     const token = await loginAndGetToken(intruso);
-    const listing = await createListing(owner.id);
+    const moto = await createMotorcycle(owner.id);
 
     const res = await request(app)
-      .post(`/api/housings/${listing.id}/imagenes`)
+      .post(`/api/motorcycles/${moto.id}/imagenes`)
       .set('Authorization', `Bearer ${token}`)
       .send({ images: [TINY_PNG_BASE64] });
 
@@ -84,17 +86,17 @@ describe('Housing Images Integration (Supabase Storage real)', () => {
   });
 
   it('rechaza sin token -> 401', async () => {
-    const res = await request(app).post('/api/housings/00000000-0000-0000-0000-000000000000/imagenes').send({ images: [TINY_PNG_BASE64] });
+    const res = await request(app).post('/api/motorcycles/00000000-0000-0000-0000-000000000000/imagenes').send({ images: [TINY_PNG_BASE64] });
     expect(res.status).toBe(401);
   });
 
   it('rechaza un body sin imagenes -> 400', async () => {
-    const landlord = await createRealUser({ role: 'landlord' });
-    const token = await loginAndGetToken(landlord);
-    const listing = await createListing(landlord.id);
+    const seller = await createRealUser({ role: 'seller' });
+    const token = await loginAndGetToken(seller);
+    const moto = await createMotorcycle(seller.id);
 
     const res = await request(app)
-      .post(`/api/housings/${listing.id}/imagenes`)
+      .post(`/api/motorcycles/${moto.id}/imagenes`)
       .set('Authorization', `Bearer ${token}`)
       .send({ images: [] });
 
@@ -102,11 +104,11 @@ describe('Housing Images Integration (Supabase Storage real)', () => {
   });
 
   it('devuelve 404 si la publicacion no existe', async () => {
-    const landlord = await createRealUser({ role: 'landlord' });
-    const token = await loginAndGetToken(landlord);
+    const seller = await createRealUser({ role: 'seller' });
+    const token = await loginAndGetToken(seller);
 
     const res = await request(app)
-      .post('/api/housings/00000000-0000-0000-0000-000000000000/imagenes')
+      .post('/api/motorcycles/00000000-0000-0000-0000-000000000000/imagenes')
       .set('Authorization', `Bearer ${token}`)
       .send({ images: [TINY_PNG_BASE64] });
 

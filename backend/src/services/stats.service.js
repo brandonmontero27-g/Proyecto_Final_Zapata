@@ -1,9 +1,9 @@
-import { findHousingsByLandlord } from '../repositories/housing.repository.js';
-import { countFavoritesByUser, countFavoritesForLandlordListings } from '../repositories/favorites.repository.js';
+import { findMotorcyclesBySeller } from '../repositories/motorcycles.repository.js';
+import { countFavoritesByUser, countFavoritesForSellerMotorcycles } from '../repositories/favorites.repository.js';
 import { countChatsForUser } from '../repositories/chat.repository.js';
 
-export async function getStudentStats(userId) {
-  const [favorites, chats] = await Promise.all([countFavoritesByUser(userId), countChatsForUser(userId, 'student')]);
+export async function getBuyerStats(userId) {
+  const [favorites, chats] = await Promise.all([countFavoritesByUser(userId), countChatsForUser(userId, 'buyer')]);
 
   return {
     savedFavorites: favorites.count ?? 0,
@@ -11,22 +11,22 @@ export async function getStudentStats(userId) {
   };
 }
 
-export async function getLandlordStats(landlordId) {
-  const [listingsResult, favoritesResult, chatsResult] = await Promise.all([
-    findHousingsByLandlord(landlordId),
-    countFavoritesForLandlordListings(landlordId),
-    countChatsForUser(landlordId, 'landlord')
+export async function getSellerStats(sellerId) {
+  const [motorcyclesResult, favoritesResult, chatsResult] = await Promise.all([
+    findMotorcyclesBySeller(sellerId),
+    countFavoritesForSellerMotorcycles(sellerId),
+    countChatsForUser(sellerId, 'seller')
   ]);
 
-  const listings = listingsResult.data || [];
-  const listingsByStatus = listings.reduce((acc, listing) => {
-    acc[listing.status] = (acc[listing.status] || 0) + 1;
+  const motorcycles = motorcyclesResult.data || [];
+  const motorcyclesByStatus = motorcycles.reduce((acc, motorcycle) => {
+    acc[motorcycle.status] = (acc[motorcycle.status] || 0) + 1;
     return acc;
   }, {});
 
   return {
-    totalListings: listings.length,
-    listingsByStatus,
+    totalMotorcycles: motorcycles.length,
+    motorcyclesByStatus,
     favoritesReceived: favoritesResult.count ?? 0,
     contactsReceived: chatsResult.count ?? 0
   };

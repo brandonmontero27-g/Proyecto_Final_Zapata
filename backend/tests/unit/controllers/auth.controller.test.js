@@ -45,7 +45,7 @@ describe('Auth Controller (Supabase local real)', () => {
     });
 
     it('hace login real y responde con token + perfil', async () => {
-      const user = await createRealUser({ role: 'student', name: 'Login Controller' });
+      const user = await createRealUser({ role: 'buyer', name: 'Login Controller' });
       req.body = { email: user.email, password: user.password };
 
       await login(req, res);

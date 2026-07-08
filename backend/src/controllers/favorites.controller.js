@@ -1,12 +1,12 @@
 import { addFavorite, removeFavorite, listFavorites } from '../services/favorites.service.js';
 
 export async function add(req, res) {
-  const favorite = await addFavorite(req.user.id, req.body.listingId);
+  const favorite = await addFavorite(req.user.id, req.body.motorcycleId);
   res.status(201).json(favorite);
 }
 
 export async function remove(req, res) {
-  const result = await removeFavorite(req.user.id, req.params.listingId);
+  const result = await removeFavorite(req.user.id, req.params.motorcycleId);
   res.json(result);
 }
 

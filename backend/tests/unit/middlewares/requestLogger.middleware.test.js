@@ -11,7 +11,7 @@ describe('requestLogger middleware', () => {
   let req, res, next;
 
   beforeEach(() => {
-    req = { method: 'GET', path: '/api/housings' };
+    req = { method: 'GET', path: '/api/motorcycles' };
     res = Object.assign(new EventEmitter(), { statusCode: 200 });
     next = jest.fn();
     logger.info.mockClear();
@@ -30,7 +30,7 @@ describe('requestLogger middleware', () => {
     res.emit('finish');
 
     expect(logger.info).toHaveBeenCalledWith(
-      expect.stringContaining('GET /api/housings - 200'),
+      expect.stringContaining('GET /api/motorcycles - 200'),
       expect.objectContaining({ requestId: req.id })
     );
   });

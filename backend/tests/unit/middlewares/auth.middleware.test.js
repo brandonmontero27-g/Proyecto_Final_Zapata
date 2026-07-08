@@ -40,7 +40,7 @@ describe('Auth Middleware (Supabase local real)', () => {
     });
 
     it('rechaza un token real valido si el perfil fue borrado', async () => {
-      const user = await createRealUser({ role: 'student' });
+      const user = await createRealUser({ role: 'buyer' });
       const token = await realToken(user);
       await supabaseAdmin.from('profiles').delete().eq('id', user.id);
 
@@ -53,13 +53,13 @@ describe('Auth Middleware (Supabase local real)', () => {
     });
 
     it('adjunta req.user y llama next() con un token real y valido', async () => {
-      const user = await createRealUser({ role: 'landlord', name: 'Arrendador Middleware' });
+      const user = await createRealUser({ role: 'seller', name: 'Vendedor Middleware' });
       const token = await realToken(user);
 
       req.headers.authorization = `Bearer ${token}`;
       await requireAuth(req, res, next);
 
-      expect(req.user).toMatchObject({ id: user.id, email: user.email, role: 'landlord', name: 'Arrendador Middleware' });
+      expect(req.user).toMatchObject({ id: user.id, email: user.email, role: 'seller', name: 'Vendedor Middleware' });
       expect(next).toHaveBeenCalled();
     });
   });
@@ -73,9 +73,9 @@ describe('Auth Middleware (Supabase local real)', () => {
     });
 
     it('rechaza con 403 si el rol no coincide', () => {
-      req.user = { role: 'student' };
+      req.user = { role: 'buyer' };
 
-      requireRole('admin', 'landlord')(req, res, next);
+      requireRole('admin', 'seller')(req, res, next);
 
       expect(res.status).toHaveBeenCalledWith(403);
       expect(next).not.toHaveBeenCalled();
@@ -84,7 +84,7 @@ describe('Auth Middleware (Supabase local real)', () => {
     it('permite continuar si el rol coincide', () => {
       req.user = { role: 'admin' };
 
-      requireRole('admin', 'landlord')(req, res, next);
+      requireRole('admin', 'seller')(req, res, next);
 
       expect(next).toHaveBeenCalled();
       expect(res.status).not.toHaveBeenCalled();

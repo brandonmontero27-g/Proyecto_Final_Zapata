@@ -10,16 +10,16 @@ import {
 } from '../repositories/chat.repository.js';
 
 async function assertParticipant(chat, userId) {
-  if (chat.student_id !== userId && chat.landlord_id !== userId) {
+  if (chat.buyer_id !== userId && chat.seller_id !== userId) {
     throw new ForbiddenError('No participas en esta conversacion');
   }
 }
 
-export async function startChat(studentId, { landlordId, listingId }) {
-  const { data: existing } = await findChatByParticipants(studentId, landlordId, listingId);
+export async function startChat(buyerId, { sellerId, motorcycleId }) {
+  const { data: existing } = await findChatByParticipants(buyerId, sellerId, motorcycleId);
   if (existing) return existing;
 
-  const { data, error } = await insertChat({ studentId, landlordId, listingId });
+  const { data, error } = await insertChat({ buyerId, sellerId, motorcycleId });
 
   if (error) {
     throw new AppError(error.message, 400, 'CHAT_CREATE_FAILED');
@@ -65,8 +65,8 @@ export async function sendMessage(chatId, user, text) {
 
   await assertParticipant(chat, user.id);
 
-  if (user.role !== 'student' && user.role !== 'landlord') {
-    throw new ForbiddenError('Solo estudiantes y arrendadores pueden enviar mensajes');
+  if (user.role !== 'buyer' && user.role !== 'seller') {
+    throw new ForbiddenError('Solo compradores y vendedores pueden enviar mensajes');
   }
 
   const { data: message, error: msgError } = await insertMessage({ chatId, sender: user.role, text });

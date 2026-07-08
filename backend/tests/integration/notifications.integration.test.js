@@ -3,11 +3,11 @@ import app from '../../src/app.js';
 import { supabaseAdmin } from '../../src/config/supabase.js';
 import { createRealUser, cleanupCreatedUsers } from '../helpers/testData.js';
 
-const createdListingIds = [];
+const createdMotorcycleIds = [];
 
 afterAll(async () => {
-  for (const id of createdListingIds.splice(0)) {
-    await supabaseAdmin.from('housing_listings').delete().eq('id', id).catch?.(() => {});
+  for (const id of createdMotorcycleIds.splice(0)) {
+    await supabaseAdmin.from('motorcycles').delete().eq('id', id).catch?.(() => {});
   }
   await cleanupCreatedUsers();
 });
@@ -17,21 +17,23 @@ async function loginAndGetToken(user) {
   return res.body.token;
 }
 
-async function publishListing(token) {
+async function publishMotorcycle(token) {
   const res = await request(app)
-    .post('/api/housings')
+    .post('/api/motorcycles')
     .set('Authorization', `Bearer ${token}`)
     .send({
-      title: 'Habitacion integration notifications',
-      description: 'Cerca de la universidad UNSCH',
-      pricePen: 300,
+      title: 'Moto integration notifications',
+      description: 'Cerca del centro de Huamanga',
+      brand: 'Honda',
+      model: 'CB1',
+      year: 2020,
+      displacementCc: 150,
+      price: 6500,
       address: 'Jr. Notificaciones 1, Huamanga',
-      neighborhood: 'San Blas',
-      distanceToUnschMinutes: 8,
-      contactPhone: '966123456',
-      type: 'room'
+      location: 'San Blas',
+      contactPhone: '966123456'
     });
-  createdListingIds.push(res.body.id);
+  createdMotorcycleIds.push(res.body.id);
   return res.body;
 }
 
@@ -39,57 +41,57 @@ describe('Notifications Integration (Supabase local real)', () => {
   it('al crear una publicacion, todos los admins reciben una notificacion', async () => {
     const admin1 = await createRealUser({ role: 'admin' });
     const admin2 = await createRealUser({ role: 'admin' });
-    const landlord = await createRealUser({ role: 'landlord' });
-    const landlordToken = await loginAndGetToken(landlord);
+    const seller = await createRealUser({ role: 'seller' });
+    const sellerToken = await loginAndGetToken(seller);
     const admin1Token = await loginAndGetToken(admin1);
     const admin2Token = await loginAndGetToken(admin2);
 
-    const listing = await publishListing(landlordToken);
+    const moto = await publishMotorcycle(sellerToken);
 
     const res1 = await request(app).get('/api/notificaciones').set('Authorization', `Bearer ${admin1Token}`);
     const res2 = await request(app).get('/api/notificaciones').set('Authorization', `Bearer ${admin2Token}`);
 
     expect(res1.status).toBe(200);
-    expect(res1.body.notifications.some((n) => n.listing_id === listing.id && n.type === 'listing_pending_review')).toBe(true);
-    expect(res2.body.notifications.some((n) => n.listing_id === listing.id && n.type === 'listing_pending_review')).toBe(true);
+    expect(res1.body.notifications.some((n) => n.motorcycle_id === moto.id && n.type === 'motorcycle_pending_review')).toBe(true);
+    expect(res2.body.notifications.some((n) => n.motorcycle_id === moto.id && n.type === 'motorcycle_pending_review')).toBe(true);
   });
 
-  it('al aprobar/observar/suspender, el arrendador dueño recibe la notificacion correspondiente', async () => {
+  it('al aprobar/observar/suspender, el vendedor dueño recibe la notificacion correspondiente', async () => {
     const admin = await createRealUser({ role: 'admin' });
-    const landlord = await createRealUser({ role: 'landlord' });
+    const seller = await createRealUser({ role: 'seller' });
     const adminToken = await loginAndGetToken(admin);
-    const landlordToken = await loginAndGetToken(landlord);
+    const sellerToken = await loginAndGetToken(seller);
 
     const cases = [
-      { estado: 'approved', type: 'listing_approved' },
-      { estado: 'flagged', type: 'listing_flagged' },
-      { estado: 'suspended', type: 'listing_suspended' }
+      { estado: 'approved', type: 'motorcycle_approved' },
+      { estado: 'flagged', type: 'motorcycle_flagged' },
+      { estado: 'suspended', type: 'motorcycle_suspended' }
     ];
 
     for (const { estado, type } of cases) {
-      const listing = await publishListing(landlordToken);
+      const moto = await publishMotorcycle(sellerToken);
 
       const reviewRes = await request(app)
-        .put(`/api/admin/habitaciones/${listing.id}/estado`)
+        .put(`/api/admin/motos/${moto.id}/estado`)
         .set('Authorization', `Bearer ${adminToken}`)
         .send({ estado });
       expect(reviewRes.status).toBe(200);
 
-      const notifRes = await request(app).get('/api/notificaciones').set('Authorization', `Bearer ${landlordToken}`);
+      const notifRes = await request(app).get('/api/notificaciones').set('Authorization', `Bearer ${sellerToken}`);
       expect(notifRes.status).toBe(200);
-      expect(notifRes.body.notifications.some((n) => n.listing_id === listing.id && n.type === type)).toBe(true);
+      expect(notifRes.body.notifications.some((n) => n.motorcycle_id === moto.id && n.type === type)).toBe(true);
     }
   });
 
   it('marcar como leida baja el unreadCount, y no se puede marcar la de otro usuario', async () => {
     const admin1 = await createRealUser({ role: 'admin' });
     const admin2 = await createRealUser({ role: 'admin' });
-    const landlord = await createRealUser({ role: 'landlord' });
-    const landlordToken = await loginAndGetToken(landlord);
+    const seller = await createRealUser({ role: 'seller' });
+    const sellerToken = await loginAndGetToken(seller);
     const admin1Token = await loginAndGetToken(admin1);
     const admin2Token = await loginAndGetToken(admin2);
 
-    await publishListing(landlordToken);
+    await publishMotorcycle(sellerToken);
 
     const before = await request(app).get('/api/notificaciones').set('Authorization', `Bearer ${admin1Token}`);
     const unreadBefore = before.body.unreadCount;

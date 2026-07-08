@@ -1,13 +1,13 @@
 import { registerUser, loginUser } from '../services/auth.service.js';
 
 export async function register(req, res) {
-  const { email, password, name, role, faculty, career, phone } = req.body;
+  const { email, password, name, role, phone } = req.body;
 
   if (!email || !password || !name) {
     return res.status(400).json({ error: 'email, password y name son obligatorios' });
   }
 
-  const user = await registerUser({ email, password, name, role, faculty, career, phone });
+  const user = await registerUser({ email, password, name, role, phone });
   res.status(201).json(user);
 }
 
