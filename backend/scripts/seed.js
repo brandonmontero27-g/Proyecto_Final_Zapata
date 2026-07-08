@@ -51,7 +51,7 @@ async function seed() {
       allListings.push(listing);
     }
   }
-  console.log(`${allListings.length} publicaciones creadas (todas aprobadas, sin fotos reales).`);
+  console.log(`${allListings.length} publicaciones creadas (todas aprobadas, con fotos de stock por tipo).`);
 
   for (const student of students) {
     const favListings = pickRandom(allListings, Math.min(3, allListings.length));

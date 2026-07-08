@@ -3,43 +3,8 @@ import { AnimatePresence, motion } from "motion/react";
 import { Mail, Lock, User, X } from "lucide-react";
 import { useAuth } from "../context/AuthContext.jsx";
 import { ApiError } from "../api/client.js";
+import { UNSCH_ACADEMIC_MAP, FACULTIES } from "../constants/content.js";
 import makiMascot from "../assets/images/maki_hawk_guindo_plomo_1782934231251.jpg";
-
-const UNSCH_ACADEMIC_MAP = {
-  "Facultad de Ingeniería de Minas, Geología y Metalurgia": [
-    "Ingeniería de Sistemas",
-    "Ingeniería de Minas",
-    "Ingeniería Civil"
-  ],
-  "Facultad de Ingeniería Química y Metalurgia": [
-    "Ingeniería Química",
-    "Ingeniería en Industrias Alimentarias",
-    "Ingeniería Agroindustrial"
-  ],
-  "Facultad de Ciencias de la Salud": ["Medicina Humana", "Enfermería", "Obstetricia"],
-  "Facultad de Ciencias Biológicas": ["Biología", "Farmacia y Bioquímica"],
-  "Facultad de Ciencias Agrarias": ["Agronomía", "Ingeniería Agrícola", "Medicina Veterinaria"],
-  "Facultad de Ciencias Sociales": [
-    "Arqueología e Historia",
-    "Trabajo Social",
-    "Antropología Social",
-    "Ciencias de la Comunicación"
-  ],
-  "Facultad de Ciencias de la Educación": [
-    "Educación Inicial",
-    "Educación Primaria",
-    "Educación Secundaria",
-    "Educación Física"
-  ],
-  "Facultad de Derecho y Ciencias Políticas": ["Derecho"],
-  "Facultad de Ciencias Económicas, Administrativas y Contables": [
-    "Administración de Empresas",
-    "Contabilidad",
-    "Economía"
-  ]
-};
-
-const FACULTIES = Object.keys(UNSCH_ACADEMIC_MAP);
 
 export default function AuthModal() {
   const { authModal, closeAuthModal, login, register } = useAuth();

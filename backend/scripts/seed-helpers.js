@@ -48,6 +48,25 @@ const AMENITIES_POOL = [
   'Baño propio', 'Amoblado', 'Servicio de cable', 'Área de estudio', 'Seguridad 24h'
 ];
 
+// Fotos de stock reales (Pexels, licencia libre de uso comercial), no scraping.
+// Se agrupan por tipo de alojamiento para que el seed luzca como un portal real.
+function pexelsUrl(id) {
+  return `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb&w=800`;
+}
+
+const IMAGE_POOL = {
+  room: [31488380, 37884161, 36099150, 6903157, 31488428, 30909593, 34574606].map(pexelsUrl),
+  apartment: [19239905, 33537442, 6920439, 15409515, 30386991, 7546648].map(pexelsUrl),
+  shared: [4781426, 5146884, 6382460, 13334679, 6382472, 8119915].map(pexelsUrl),
+  family: [27467329, 5557735, 30580640, 30503925, 31406334, 31517287].map(pexelsUrl)
+};
+
+function pickListingImages(type) {
+  const pool = IMAGE_POOL[type] || IMAGE_POOL.room;
+  const count = randomInt(2, 3);
+  return pickRandom(pool, Math.min(count, pool.length));
+}
+
 const DESCRIPTION_TEMPLATES = [
   (n) => `Habitación tranquila en ${n}, ideal para estudiantes de la UNSCH. Ambiente familiar y seguro.`,
   (n) => `Alojamiento cómodo cerca de ${n}, a pocos minutos de la universidad. Buena iluminación natural.`,
@@ -77,6 +96,7 @@ export function buildSyntheticListing(neighborhood, type) {
     address: `${street} ${randomInt(100, 950)}`,
     description: descTemplate(neighborhood),
     contact_phone: `9${randomInt(10000000, 99999999)}`,
-    amenities
+    amenities,
+    images: pickListingImages(type)
   };
 }

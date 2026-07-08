@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Search, Home, MessageCircle, Check, ChevronLeft, ChevronRight, Compass, Map, MapPin, Sparkles } from "lucide-react";
+import { useEffect, useMemo, useRef, useState, lazy, Suspense } from "react";
+import { Search, Home, MessageCircle, Check, ChevronLeft, ChevronRight, Compass, Map, Sparkles } from "lucide-react";
 import { listHousingsRequest } from "../api/housings.js";
 import { listFavoritesRequest, addFavoriteRequest, removeFavoriteRequest } from "../api/favorites.js";
 import { ApiError } from "../api/client.js";
@@ -11,68 +11,7 @@ import unschEntranceImg from "../assets/images/unsch_entrance_1782935837751.webp
 import unschLogoIcon from "../assets/images/unsch_logo_icon_new_1782937711905.jpg";
 import makiMascot from "../assets/images/maki_hawk_guindo_plomo_1782934231251.jpg";
 
-// Distribuye los pines del mapa evitando solapamientos, usando una posicion
-// relativa aleatoria (pero estable por listing.id) cuando no hay coordenadas.
-function useDeoverlappedPins(listings) {
-  return useMemo(() => {
-    const unschX = 50;
-    const unschY = 33.33;
-    const minDistance = 7.5;
-
-    const seeded = (id, salt) => {
-      let hash = 0;
-      const str = id + salt;
-      for (let i = 0; i < str.length; i++) hash = (hash * 31 + str.charCodeAt(i)) >>> 0;
-      return (hash % 1000) / 1000;
-    };
-
-    const adjusted = listings.map((item) => {
-      const hasCoords = item.coordinate_x != null && item.coordinate_y != null;
-      const x = hasCoords ? item.coordinate_x : 25 + seeded(item.id, "x") * 50;
-      const y = hasCoords ? item.coordinate_y : 20 + seeded(item.id, "y") * 60;
-      return { ...item, adjX: x, adjY: y };
-    });
-
-    for (let iter = 0; iter < 10; iter++) {
-      let changed = false;
-      for (let i = 0; i < adjusted.length; i++) {
-        const itemA = adjusted[i];
-        const dxU = itemA.adjX - unschX;
-        const dyU = itemA.adjY - unschY;
-        const distU = Math.sqrt(dxU * dxU + dyU * dyU);
-        if (distU < minDistance + 4) {
-          const angle = distU > 0 ? Math.atan2(dyU, dxU) : i * 1.2;
-          itemA.adjX = unschX + Math.cos(angle) * (minDistance + 5);
-          itemA.adjY = unschY + Math.sin(angle) * (minDistance + 5);
-          changed = true;
-        }
-
-        for (let j = 0; j < adjusted.length; j++) {
-          if (i === j) continue;
-          const itemB = adjusted[j];
-          const dx = itemA.adjX - itemB.adjX;
-          const dy = itemA.adjY - itemB.adjY;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < minDistance) {
-            const angle = dist > 0 ? Math.atan2(dy, dx) : (i - j) * 0.5;
-            const push = (minDistance - dist) / 2;
-            itemA.adjX += Math.cos(angle) * push;
-            itemA.adjY += Math.sin(angle) * push;
-            itemB.adjX -= Math.cos(angle) * push;
-            itemB.adjY -= Math.sin(angle) * push;
-            changed = true;
-          }
-        }
-
-        itemA.adjX = Math.max(8, Math.min(92, itemA.adjX));
-        itemA.adjY = Math.max(8, Math.min(92, itemA.adjY));
-      }
-      if (!changed) break;
-    }
-
-    return adjusted;
-  }, [listings]);
-}
+const ListingsMap = lazy(() => import("../components/ListingsMap.jsx"));
 
 const PAGE_SIZE = 24;
 
@@ -153,8 +92,6 @@ export default function ExplorePage() {
     );
   }, [listings, searchQuery]);
 
-  const deoverlappedListings = useDeoverlappedPins(filteredListings);
-
   function handleFilterSubmit(e) {
     e.preventDefault();
     load();
@@ -198,10 +135,6 @@ export default function ExplorePage() {
     }
   }
 
-  const selectedDeoverlapped = selectedListing
-    ? deoverlappedListings.find((l) => l.id === selectedListing.id)
-    : null;
-
   return (
     <>
       <section className="relative min-h-[420px] flex items-center justify-center py-12 px-4 bg-gradient-to-r from-guindo-dark to-[#300a0a] text-white overflow-hidden">
@@ -216,7 +149,7 @@ export default function ExplorePage() {
 
         <div className="max-w-4xl mx-auto text-center relative z-10 space-y-8 w-full">
           <h2 className="text-3xl md:text-5xl font-black tracking-tight leading-tight md:leading-none">
-            Encuentra alojamiento para estudiantes en <span className="text-[#FFC000]">Ayacucho</span>
+            Encuentra alojamiento para estudiantes en <span className="text-dorado-dark">Ayacucho</span>
           </h2>
 
           <form
@@ -279,16 +212,16 @@ export default function ExplorePage() {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto pt-4 text-xs font-semibold text-slate-200">
             <div className="flex items-center justify-center gap-2">
-              <Check className="h-4 w-4 text-[#FFD700]" /> <span>Cero comisiones ocultas</span>
+              <Check className="h-4 w-4 text-dorado" /> <span>Cero comisiones ocultas</span>
             </div>
             <div className="flex items-center justify-center gap-2">
-              <Check className="h-4 w-4 text-[#FFD700]" /> <span>Verificación con Maki IA</span>
+              <Check className="h-4 w-4 text-dorado" /> <span>Verificación con Maki IA</span>
             </div>
             <div className="flex items-center justify-center gap-2">
-              <Check className="h-4 w-4 text-[#FFD700]" /> <span>Ahorra en mototaxis</span>
+              <Check className="h-4 w-4 text-dorado" /> <span>Ahorra en mototaxis</span>
             </div>
             <div className="flex items-center justify-center gap-2">
-              <Check className="h-4 w-4 text-[#FFD700]" /> <span>Trato directo con dueño</span>
+              <Check className="h-4 w-4 text-dorado" /> <span>Trato directo con dueño</span>
             </div>
           </div>
         </div>
@@ -313,7 +246,7 @@ export default function ExplorePage() {
 
           <div className="md:col-span-9 space-y-4">
             <div className="inline-flex items-center gap-1.5 bg-guindo/5 border border-guindo/20 px-3 py-1 rounded-full text-xs font-black text-guindo">
-              <Sparkles className="h-3.5 w-3.5 text-[#FFD700]" />
+              <Sparkles className="h-3.5 w-3.5 text-dorado" />
               <span>CONSEJOS DE CONVIVENCIA UNIVERSITARIA EN AYACUCHO</span>
             </div>
 
@@ -450,71 +383,19 @@ export default function ExplorePage() {
               <span className="bg-guindo/10 text-guindo text-[10px] font-black px-2.5 py-1 rounded-lg">Ayacucho</span>
             </div>
 
-            <div className="bg-[#EFECE5] rounded-2xl h-80 border border-slate-200 relative overflow-hidden">
-              <div className="absolute inset-0 opacity-40 pointer-events-none">
-                <div className="absolute left-[20%] top-0 bottom-0 w-2 bg-slate-300" />
-                <div className="absolute left-[50%] top-0 bottom-0 w-2 bg-slate-300" />
-                <div className="absolute left-[80%] top-0 bottom-0 w-2 bg-slate-300" />
-                <div className="absolute top-[35%] left-0 right-0 h-2 bg-slate-300" />
-                <div className="absolute top-[70%] left-0 right-0 h-2 bg-slate-300" />
-              </div>
-
-              <div className="absolute left-1/2 top-1/3 -translate-x-1/2 -translate-y-1/2 text-center z-10">
-                <div className="bg-guindo border-2 border-white text-white p-2 rounded-2xl shadow-xl flex flex-col items-center gap-1">
-                  <div className="h-8 w-8 rounded-xl overflow-hidden bg-white border border-slate-200 shadow-sm flex items-center justify-center shrink-0">
-                    <img src={unschLogoIcon} alt="UNSCH Logo Map" className="w-full h-full object-cover rounded-lg" />
-                  </div>
-                  <span className="text-[9px] font-black tracking-widest font-mono px-1 uppercase text-[#FFD700]">CAMPUS UNSCH</span>
+            <Suspense
+              fallback={
+                <div className="rounded-2xl border border-slate-200 h-96 bg-[#F8F9FA] animate-pulse flex items-center justify-center text-xs text-slate-400 font-bold">
+                  Cargando mapa...
                 </div>
-              </div>
-
-              {selectedListing && selectedDeoverlapped && (
-                <svg className="absolute inset-0 w-full h-full pointer-events-none z-0">
-                  <line
-                    x1={`${selectedDeoverlapped.adjX}%`}
-                    y1={`${selectedDeoverlapped.adjY}%`}
-                    x2="50%"
-                    y2="33.3%"
-                    stroke="#800020"
-                    strokeWidth="2"
-                    strokeDasharray="4 4"
-                    className="animate-pulse"
-                  />
-                </svg>
-              )}
-
-              {deoverlappedListings.map((room) => {
-                const isSelected = selectedListing?.id === room.id;
-                return (
-                  <button
-                    key={room.id}
-                    onClick={() => setSelectedListing(room)}
-                    className={`absolute p-1 -translate-x-1/2 -translate-y-1/2 hover:z-20 transition-all cursor-pointer group ${isSelected ? "z-30" : ""}`}
-                    style={{ left: `${room.adjX}%`, top: `${room.adjY}%` }}
-                  >
-                    <div className="flex flex-col items-center">
-                      <span
-                        className={`text-[9px] font-bold px-1.5 py-0.5 rounded shadow border border-white transition-all scale-100 group-hover:scale-105 font-mono ${
-                          isSelected ? "bg-[#FFC000] text-slate-900 border-[#FFD700]" : "bg-guindo text-white group-hover:bg-plomo-dark"
-                        }`}
-                      >
-                        S/.{room.price_pen}
-                      </span>
-                      <MapPin
-                        className={`h-4.5 w-4.5 transition-all scale-100 group-hover:scale-110 ${
-                          isSelected ? "text-[#FFC000] drop-shadow-[0_0_8px_rgba(255,192,0,0.8)]" : "text-guindo group-hover:text-plomo-dark"
-                        }`}
-                      />
-                    </div>
-                  </button>
-                );
-              })}
-
-              <div className="absolute bottom-3 left-3 right-3 bg-white/90 backdrop-blur-sm px-3.5 py-2 rounded-xl text-[10px] text-slate-500 font-bold border border-slate-100 flex items-center justify-between">
-                <span>📍 Toca los pines para ver el cuarto en el mapa</span>
-                <span className="text-guindo">YachakuqWasi</span>
-              </div>
-            </div>
+              }
+            >
+              <ListingsMap
+                listings={filteredListings}
+                onSelectListing={setSelectedListing}
+                selectedListingId={selectedListing?.id}
+              />
+            </Suspense>
           </div>
         </section>
 
@@ -530,7 +411,7 @@ export default function ExplorePage() {
                 <div className="space-y-2">
                   <div className="flex gap-0.5">
                     {[...Array(t.rating)].map((_, i) => (
-                      <span key={i} className="text-[#FFC000] text-sm">★</span>
+                      <span key={i} className="text-dorado-dark text-sm">★</span>
                     ))}
                   </div>
                   <p className="text-slate-600 text-xs leading-relaxed italic">"{t.content}"</p>
@@ -565,7 +446,7 @@ export default function ExplorePage() {
               </p>
             </div>
             <div className="md:col-span-5 md:text-right space-y-2">
-              <span className="text-[9px] font-mono bg-white/10 text-[#FFD700] px-3 py-1.5 rounded-lg inline-block uppercase font-black tracking-widest">
+              <span className="text-[9px] font-mono bg-white/10 text-dorado px-3 py-1.5 rounded-lg inline-block uppercase font-black tracking-widest">
                 Sumaq Yachay • Ayacucho, Perú
               </span>
             </div>

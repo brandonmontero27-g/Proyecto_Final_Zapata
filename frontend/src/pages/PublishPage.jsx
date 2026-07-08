@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext.jsx";
 import { createHousingRequest, uploadHousingImagesRequest } from "../api/housings.js";
 import { ApiError } from "../api/client.js";
 import { NEIGHBORHOODS } from "../constants/content.js";
+import { fileToDataUrl } from "../utils/files.js";
 
 const MAX_PHOTOS = 8;
 
@@ -18,15 +19,6 @@ const initialForm = {
   contactPhone: "",
   amenities: []
 };
-
-function fileToDataUrl(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
 
 export default function PublishPage() {
   const { token } = useAuth();

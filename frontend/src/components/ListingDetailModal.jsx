@@ -5,10 +5,8 @@ import { X, ChevronLeft, ChevronRight, MapPin, Clock, Check, Phone, ExternalLink
 import { TYPE_LABEL } from "../constants/content.js";
 import { useAuth } from "../context/AuthContext.jsx";
 import { startChatRequest } from "../api/chat.js";
+import { getPlaceholderImages } from "../constants/placeholderImages.js";
 import makiMascot from "../assets/images/maki_hawk_guindo_plomo_1782934231251.jpg";
-
-const PLACEHOLDER_IMG =
-  "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=600&q=80";
 
 export default function ListingDetailModal({ listing, onClose }) {
   const { isAuthenticated, user, token, openAuthModal } = useAuth();
@@ -16,7 +14,8 @@ export default function ListingDetailModal({ listing, onClose }) {
   const [galleryIndex, setGalleryIndex] = useState(0);
   const [startingChat, setStartingChat] = useState(false);
   const [chatError, setChatError] = useState("");
-  const images = listing?.images?.length > 0 ? listing.images : [PLACEHOLDER_IMG];
+  const images =
+    listing?.images?.length > 0 ? listing.images : getPlaceholderImages(listing?.type, listing?.id);
 
   if (!listing) return null;
 
@@ -101,7 +100,7 @@ export default function ListingDetailModal({ listing, onClose }) {
 
             <div className="absolute top-4 left-4 flex gap-2 z-10">
               {listing.verified_by_maki && (
-                <span className="bg-[#FFC000] text-slate-900 text-[9px] font-black px-2.5 py-1 rounded-lg uppercase tracking-wider font-mono shadow">
+                <span className="bg-dorado-dark text-slate-900 text-[9px] font-black px-2.5 py-1 rounded-lg uppercase tracking-wider font-mono shadow">
                   Maki Verificado
                 </span>
               )}
@@ -224,7 +223,7 @@ export default function ListingDetailModal({ listing, onClose }) {
                 href={`tel:${listing.contact_phone}`}
                 className="bg-guindo text-white py-2.5 rounded-xl text-xs font-black hover:bg-guindo-dark transition-all shadow-md flex items-center gap-1.5 cursor-pointer justify-center"
               >
-                <Phone className="h-3.5 w-3.5 text-[#FFD700]" />
+                <Phone className="h-3.5 w-3.5 text-dorado" />
                 <span>Llamar</span>
               </a>
 

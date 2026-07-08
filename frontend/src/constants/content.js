@@ -74,3 +74,39 @@ export const TYPE_OPTIONS = [
 ];
 
 export const TYPE_LABEL = { room: "Habitación", apartment: "Departamento", shared: "Compartido", family: "Familiar" };
+
+export const UNSCH_ACADEMIC_MAP = {
+  "Facultad de Ingeniería de Minas, Geología y Metalurgia": [
+    "Ingeniería de Sistemas",
+    "Ingeniería de Minas",
+    "Ingeniería Civil"
+  ],
+  "Facultad de Ingeniería Química y Metalurgia": [
+    "Ingeniería Química",
+    "Ingeniería en Industrias Alimentarias",
+    "Ingeniería Agroindustrial"
+  ],
+  "Facultad de Ciencias de la Salud": ["Medicina Humana", "Enfermería", "Obstetricia"],
+  "Facultad de Ciencias Biológicas": ["Biología", "Farmacia y Bioquímica"],
+  "Facultad de Ciencias Agrarias": ["Agronomía", "Ingeniería Agrícola", "Medicina Veterinaria"],
+  "Facultad de Ciencias Sociales": [
+    "Arqueología e Historia",
+    "Trabajo Social",
+    "Antropología Social",
+    "Ciencias de la Comunicación"
+  ],
+  "Facultad de Ciencias de la Educación": [
+    "Educación Inicial",
+    "Educación Primaria",
+    "Educación Secundaria",
+    "Educación Física"
+  ],
+  "Facultad de Derecho y Ciencias Políticas": ["Derecho"],
+  "Facultad de Ciencias Económicas, Administrativas y Contables": [
+    "Administración de Empresas",
+    "Contabilidad",
+    "Economía"
+  ]
+};
+
+export const FACULTIES = Object.keys(UNSCH_ACADEMIC_MAP);
