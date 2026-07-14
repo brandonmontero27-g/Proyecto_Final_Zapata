@@ -2,9 +2,13 @@ import winston from 'winston';
 import path from 'path';
 import fs from 'fs';
 
+// En Vercel (y otros entornos serverless) el filesystem del despliegue es de
+// solo lectura fuera de /tmp: no se puede escribir logs/ junto al codigo.
+// Ahi el logging va solo a stdout, que la plataforma ya captura.
+const isServerless = Boolean(process.env.VERCEL);
 const logsDir = path.join(process.cwd(), 'logs');
 
-if (!fs.existsSync(logsDir)) {
+if (!isServerless && !fs.existsSync(logsDir)) {
   fs.mkdirSync(logsDir, { recursive: true });
 }
 
@@ -21,16 +25,17 @@ const format = winston.format.combine(
   })
 );
 
-const logger = winston.createLogger({
-  level: process.env.LOG_LEVEL || 'info',
-  format,
-  transports: [
-    new winston.transports.Console({
-      format: winston.format.combine(
-        winston.format.colorize({ all: true }),
-        format
-      )
-    }),
+const transports = [
+  new winston.transports.Console({
+    format: winston.format.combine(
+      winston.format.colorize({ all: true }),
+      format
+    )
+  })
+];
+
+if (!isServerless) {
+  transports.push(
     new winston.transports.File({
       filename: path.join(logsDir, 'error.log'),
       level: 'error',
@@ -40,7 +45,13 @@ const logger = winston.createLogger({
       filename: path.join(logsDir, 'combined.log'),
       format
     })
-  ]
+  );
+}
+
+const logger = winston.createLogger({
+  level: process.env.LOG_LEVEL || 'info',
+  format,
+  transports
 });
 
 export default logger;

@@ -1,0 +1,7 @@
+tests/
+coverage/
+logs/
+scripts/
+.env
+.env.test
+*.log

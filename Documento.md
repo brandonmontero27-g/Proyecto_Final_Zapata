@@ -56,10 +56,15 @@ que me impulsó a cumplir este sueño. Este logro profesional es también suyo.
 La presente investigación, de tipo aplicada y nivel descriptivo, tuvo como objetivo
 general desarrollar una plataforma web de compra y venta de motocicletas nuevas y usadas
 para el mercado peruano, materializada en un Producto Mínimo Viable (MVP) denominado
-**MotoMarket**. Metodológicamente, se empleó un enfoque híbrido ágil, integrando el marco
-de trabajo Scrum para la gestión iterativa de las fases de análisis, diseño e implementación,
-junto con prácticas de Extreme Programming (XP) para asegurar la calidad del código. A
-nivel arquitectónico, se construyó una Single Page Application (SPA) estructurada con
+**MotoMarket**. Metodológicamente, el requisito principal y de mayor jerarquía de la
+investigación fue la aplicación de **Spec-Driven Development (SDD)** como metodología
+rectora del proyecto: cada funcionalidad del sistema queda registrada como una especificación
+de negocio verificable (`specs/<NNN>-<slug>/spec.md`), regida por una constitución técnica de
+principios no negociables (`.specify/memory/constitution.md`), antes de traducirse en un plan
+técnico y en tareas de implementación. Dentro de ese ciclo rector, se empleó el marco de
+trabajo Scrum como marco operativo para la gestión iterativa de las fases de análisis, diseño e
+implementación, y las prácticas de Extreme Programming (XP) para asegurar la calidad del
+código producido en cada especificación. A nivel arquitectónico, se construyó una Single Page Application (SPA) estructurada con
 React.js en el frontend, Node.js con Express en el backend, y Supabase (PostgreSQL
 gestionado, autenticación y almacenamiento de objetos) como plataforma de datos. La
 evaluación de la plataforma se realizó mediante un diseño transversal enfocado en dos
@@ -80,7 +85,7 @@ estructuración y formalización del comercio digital de motocicletas de segunda
 nuevas en el Perú.
 
 **Palabras clave:** Plataforma web, Comercio electrónico C2C, Producto Mínimo
-Viable, Scrum, React.js, Supabase, Motocicletas.
+Viable, Scrum, Spec-Driven Development, React.js, Supabase, Motocicletas.
 
 ---
 
@@ -88,10 +93,15 @@ Viable, Scrum, React.js, Supabase, Motocicletas.
 
 This applied and descriptive research aimed to develop a web platform for the buying
 and selling of new and used motorcycles for the Peruvian market, materialized as a Minimum
-Viable Product (MVP) called **MotoMarket**. Methodologically, a hybrid agile approach was
-employed, integrating the Scrum framework for the iterative management of the analysis,
-design, and implementation phases, along with Extreme Programming (XP) practices to
-ensure code quality. At the architectural level, a Single Page Application (SPA) was built,
+Viable Product (MVP) called **MotoMarket**. Methodologically, the main and highest-priority
+requirement of the research was the application of **Spec-Driven Development (SDD)** as the
+project's governing methodology: every system capability is recorded as a verifiable business
+specification (`specs/<NNN>-<slug>/spec.md`), governed by a technical constitution of
+non-negotiable principles (`.specify/memory/constitution.md`), before being translated into a
+technical plan and implementation tasks. Within that governing cycle, the Scrum framework
+was applied as the operational framework for the iterative management of the analysis, design,
+and implementation phases, together with Extreme Programming (XP) practices to ensure the
+quality of the code produced for each specification. At the architectural level, a Single Page Application (SPA) was built,
 structured with React.js on the frontend, Node.js with Express on the backend, and Supabase
 (managed PostgreSQL, authentication, and object storage) as the data platform. The
 evaluation of the platform was carried out through a cross-sectional design focused on two
@@ -110,7 +120,7 @@ solution backed by automated evidence, laying proven operational foundations for
 structuring and formalization of the digital trade of new and used motorcycles in Peru.
 
 **Keywords:** Web platform, C2C E-commerce, Minimum Viable Product, Scrum,
-React.js, Supabase, Motorcycles.
+Spec-Driven Development, React.js, Supabase, Motorcycles.
 
 ---
 
@@ -182,9 +192,13 @@ Supabase sobre PostgreSQL) que resuelve la fricción comunicacional y la desorga
 comercio C2C de motocicletas. Socialmente, fomenta un entorno de transacciones más seguro
 mediante el registro de identidades, la moderación administrativa de publicaciones y un
 asistente conversacional que orienta al comprador antes de adquirir una moto usada.
-Metodológicamente, demuestra la viabilidad de hibridar el marco de trabajo ágil Scrum con las
-prácticas de ingeniería de Extreme Programming (XP), reforzadas con automatización de
-pruebas de software, para la construcción de un producto de calidad verificable.
+Metodológicamente, el requisito de mayor jerarquía del proyecto fue la aplicación de
+**Spec-Driven Development (SDD)** como metodología central, mecanismo de trazabilidad
+entre el requisito de negocio y el artefacto de código; sobre esa base rectora, se demuestra
+además la viabilidad de ejecutar cada especificación hibridando el marco de trabajo ágil
+Scrum con las prácticas de ingeniería de Extreme Programming (XP), reforzadas con
+automatización de pruebas de software, para la construcción de un producto de calidad
+verificable.
 
 En cuanto a sus alcances y delimitaciones, el proyecto se enfoca en el desarrollo de un
 Producto Mínimo Viable (MVP). Operativamente, la plataforma delega el cierre de
@@ -206,7 +220,7 @@ Finalmente, la estructura del documento se organiza en cinco capítulos: El Cap�
 detalla el planteamiento del problema, los objetivos y la justificación. El Capítulo II desarrolla
 el marco teórico, abarcando los antecedentes y las bases conceptuales de la ingeniería web y el
 comercio electrónico. El Capítulo III describe el marco metodológico, el tipo de investigación
-y la integración de las metodologías ágiles (Scrum y XP). El Capítulo IV expone los
+y la integración de las metodologías ágiles (Scrum, XP y Spec-Driven Development). El Capítulo IV expone los
 resultados del desarrollo por Sprints y la discusión sobre la validación funcional automatizada
 y la evaluación de la usabilidad. Por último, el Capítulo V presenta las conclusiones finales y
 las recomendaciones para futuras líneas de trabajo.
@@ -391,9 +405,10 @@ permite crear una Single Page Application (SPA) de alto rendimiento. Asimismo, e
 para la persistencia, autenticación y almacenamiento de imágenes, permite delegar en
 infraestructura administrada aspectos críticos de seguridad (emisión y verificación de tokens
 JWT, políticas de seguridad a nivel de fila) sin sacrificar el control de la lógica de negocio, que
-permanece centralizada en el backend propio. La aplicación de una metodología ágil híbrida
-(Scrum + XP), reforzada con una suite de pruebas automatizadas, justifica el enfoque de
-mejora continua y de calidad verificable del software entregado.
+permanece centralizada en el backend propio. La aplicación de **Spec-Driven Development
+(SDD)** como metodología central —con Scrum y Extreme Programming (XP) operando dentro
+de su ciclo, reforzados con una suite de pruebas automatizadas— justifica el enfoque de
+trazabilidad, mejora continua y calidad verificable del software entregado.
 
 ##### 1.5.3 Delimitación
 
@@ -442,6 +457,17 @@ eventualmente podría requerir refactorización futura para mantener su compatib
 "Tico" depende de la disponibilidad de proveedores externos de inteligencia artificial (Google
 Gemini o Groq); si ninguna clave de API está configurada, el sistema recurre a un modo de
 respuesta simulada predefinida para no interrumpir la experiencia del usuario.
+
+**1.5.4.6. Adopción parcial de Spec-Driven Development (SDD).** La metodología SDD se
+incorporó al proyecto en una etapa posterior a la construcción del MVP descrito en los cinco
+Sprints iniciales. En consecuencia, las especificaciones de las once capacidades del sistema
+(`specs/002` a `specs/011`) fueron redactadas de manera **retroactiva** —documentando
+funcionalidad ya implementada y verificada— y sirven como línea base formal para el
+desarrollo de nuevas funcionalidades. Únicamente la especificación `specs/001` (reporte de
+publicaciones sospechosas) se construyó de forma prospectiva (*spec-first*), y a la fecha de
+esta documentación cuenta con su `spec.md` aprobado, quedando pendientes las fases de
+`/plan`, `/tasks` e `/implement` de dicho flujo, tal como se detalla en el Capítulo III y en el
+Anexo 6.
 
 ---
 
@@ -923,6 +949,50 @@ PostgreSQL/Supabase garantizó el cumplimiento de las propiedades ACID y la inte
 referencial de los datos, evitando anomalías como la existencia de publicaciones huérfanas si
 un vendedor elimina su cuenta (mediante restricciones `ON DELETE CASCADE`).
 
+##### 2.2.15 Spec-Driven Development (SDD)
+
+El *Spec-Driven Development* (SDD), o desarrollo dirigido por especificaciones, es una
+metodología de ingeniería de software que invierte la relación tradicional entre especificación
+y código: en lugar de que la documentación de requisitos sea un artefacto secundario redactado
+después —o en paralelo— a la implementación, la especificación se convierte en la **fuente de
+verdad** de la que el código se deriva, y contra la cual se puede volver a auditar y regenerar
+(GitHub, 2025). Según el kit de herramientas de referencia que formaliza esta práctica, el flujo
+de trabajo se organiza en cuatro artefactos secuenciales y verificables: (1) una especificación
+de negocio (*spec*) que describe el **qué** y el **por qué** de una funcionalidad en lenguaje
+libre de tecnología; (2) un plan técnico (*plan*) que traduce esa especificación en decisiones de
+arquitectura concretas, contrastadas contra un conjunto de principios de gobernanza del
+proyecto; (3) un desglose de tareas (*tasks*) atómicas y ordenadas, verificables una a una; y (4)
+la ejecución de dichas tareas (*implement*) hasta completar el incremento (GitHub, 2025).
+
+Esta metodología no elimina a los marcos ágiles de gestión (Scrum) ni a las prácticas de
+ingeniería de código (XP), sino que los subordina operativamente dentro de su propio ciclo
+(`/specify → /plan → /tasks → /implement`), resolviendo un problema que ninguno de los dos
+aborda de forma explícita por sí solo: la **trazabilidad** entre la necesidad de negocio original y
+el artefacto de software final. Pressman y Maxim (2021) ya advertían que una de las causas más
+persistentes de defectos de software es la degradación progresiva de la especificación de
+requisitos a medida que el código evoluciona sin que la documentación se actualice en
+paralelo; el SDD ataca directamente este problema al obligar a que cada nueva capacidad del
+sistema —o, en un proyecto ya existente, cada capacidad relevante ya implementada— quede
+documentada en una carpeta versionada (`specs/<NNN>-<slug>/`) que convive con el código
+fuente en el mismo repositorio, en lugar de en un documento externo desactualizable.
+
+Un segundo componente distintivo del SDD es la **constitución del proyecto**: un documento
+único y versionado (`.specify/memory/constitution.md`) que enumera los principios no
+negociables de la arquitectura y la calidad del software, contra los cuales todo plan técnico
+debe justificarse explícitamente antes de ejecutarse (sección "Constitution Check"). Esta idea
+guarda relación directa con el concepto de *arquitectura gobernada* descrito por Sommerville
+(2011), quien sostiene que la consistencia arquitectónica de un sistema de software a largo
+plazo depende de que las decisiones de diseño se validen contra un conjunto explícito y estable
+de restricciones, en lugar de depender únicamente del criterio individual de quien programa en
+un momento dado.
+
+Finalmente, el SDD resulta particularmente pertinente en proyectos —como el presente— donde
+la implementación se apoya en asistentes de codificación basados en inteligencia artificial: al
+fijar la especificación, el plan y las tareas como artefactos legibles tanto por humanos como por
+agentes de software, se reduce la ambigüedad inherente a instrucciones informales y se
+incrementa la probabilidad de que el código generado sea consistente con la intención de
+negocio original (GitHub, 2025).
+
 ---
 
 ## Capítulo III
@@ -941,9 +1011,10 @@ sector específico, basándose en los hallazgos de la investigación básica.
 En este estudio, se utiliza el conocimiento teórico de la Ingeniería de Software y el
 desarrollo web para dar solución a una problemática concreta: la informalidad y
 desorganización en el comercio de compra-venta de motocicletas en el Perú. No se busca
-generar nueva teoría pura, sino aplicar tecnologías existentes (React, Node.js, Supabase,
-Scrum) para construir una herramienta funcional —MotoMarket— que transforme una
-realidad.
+generar nueva teoría pura, sino aplicar tecnologías y metodologías existentes (React, Node.js,
+Supabase, Scrum, Extreme Programming y, como requisito metodológico principal,
+Spec-Driven Development) para construir una herramienta funcional —MotoMarket— que
+transforme una realidad.
 
 #### 3.2 Nivel de investigación
 
@@ -1175,7 +1246,61 @@ instrumento SUS a la muestra piloto, deberán procesarse mediante el algoritmo m
 tabulación estandarizado de Brooke (1996), consolidando las respuestas en un *Score* global
 de 0 a 100.
 
-##### 3.6.5 Técnicas para aplicar el marco de trabajo Scrum
+##### 3.6.5 Spec-Driven Development (SDD) como metodología central de la investigación
+
+El requisito metodológico principal y de mayor jerarquía para la ejecución técnica del
+presente proyecto fue la aplicación de **Spec-Driven Development (SDD)**, apoyada en el kit
+de herramientas de referencia de esta metodología (GitHub, 2025). A diferencia de un marco
+de gestión (Scrum) o de un conjunto de prácticas de ingeniería de código (XP), el SDD opera
+como la metodología rectora del proyecto: define la unidad de trabajo (la especificación de
+una funcionalidad), la fuente de verdad del sistema (la carpeta `specs/<NNN>-<slug>/`, por
+encima del propio código) y las reglas no negociables que todo plan técnico debe cumplir (la
+constitución del proyecto). Scrum y Extreme Programming, descritos en la sección 3.6.6, se
+aplicaron como marcos **operativos** subordinados a este ciclo: Scrum aportó la cadencia
+iterativa y los roles para ejecutar cada especificación, y XP aportó las prácticas de ingeniería
+para que la fase `/implement` del ciclo SDD produjera código de calidad verificable. Su
+aplicación se estructuró en dos componentes concretos, verificables directamente en el
+repositorio del proyecto:
+
+**3.6.5.1 Constitución del proyecto.** Se redactó el documento
+`.specify/memory/constitution.md` (versión 1.0.0, ratificada el 9 de julio de 2026), que
+enumera siete principios no negociables contra los cuales se valida todo plan técnico antes de
+su ejecución: (I) arquitectura por capas estricta (`routes → controllers → services →
+repositories`), (II) validación de entrada en el borde de la API mediante Zod, (III)
+centralización del manejo de errores de dominio, (IV) prohibición de credenciales
+`hardcodeadas` (uso exclusivo de variables de entorno), (V) pruebas automatizadas como parte
+de la *Definition of Done* de toda funcionalidad de backend, (VI) simplicidad y prohibición de
+sobre-ingeniería, y (VII) adherencia del frontend al sistema de diseño ya vigente para el
+proyecto. Cada plan técnico que se aparte de un principio debe justificarlo explícitamente en
+una sección de verificación ("Constitution Check"), bajo riesgo de ser rechazado. Esta
+constitución es, en la práctica, la instancia que subordina las decisiones puntuales de Scrum y
+de XP a un criterio único y auditable para todo el proyecto.
+
+**3.6.5.2 Especificación por funcionalidad.** Cada capacidad relevante del sistema se
+documentó en una carpeta independiente `specs/<NNN>-<slug>/`, siguiendo la plantilla oficial
+del kit de herramientas (`.specify/templates/`). El artefacto mínimo de cada carpeta es
+`spec.md`, redactado íntegramente en lenguaje de negocio (sin nombrar frameworks, tablas o
+*endpoints*), y compuesto por: escenarios de usuario (camino principal y casos alternativos),
+requisitos funcionales verificables, entidades clave del dominio, alcance y fuera-de-alcance
+explícitos, y una lista de criterios de aceptación. El flujo completo se ejecuta en cuatro pasos
+—`/specify → /plan → /tasks → /implement`— donde `/plan` traduce la especificación en un
+plan técnico validado contra la constitución, `/tasks` lo descompone en tareas atómicas
+ordenadas, y `/implement` las ejecuta; opcionalmente, una especificación puede incluir
+`data-model.md`, `contracts/` y `research.md` para funcionalidades de mayor complejidad
+técnica.
+
+Como se detalla en el Capítulo IV, once capacidades del sistema fueron documentadas bajo este
+esquema: diez de ellas (`specs/002` a `specs/011`) de forma **retroactiva**, formalizando como
+línea base la funcionalidad ya construida durante los cinco Sprints descritos en la sección 3.6.6,
+y una (`specs/001`) de forma **prospectiva** (*spec-first*), como primera funcionalidad nueva
+concebida directamente bajo este flujo de trabajo.
+
+##### 3.6.6 Scrum y Extreme Programming (XP) como marcos operativos dentro del ciclo SDD
+
+Dentro del ciclo rector definido por SDD (sección 3.6.5), el proyecto ejecutó cada
+especificación mediante dos marcos operativos complementarios entre sí: Scrum, para la
+cadencia iterativa y los roles de gestión, y Extreme Programming (XP), para las prácticas de
+ingeniería que garantizan la calidad del código producido en la fase `/implement`.
 
 El marco de trabajo Scrum se basa en tres pilares fundamentales: roles, eventos y
 artefactos, adaptados metodológicamente a la naturaleza de un proyecto de desarrollo
@@ -1191,7 +1316,10 @@ donde se validó el funcionamiento del código incremental frente a los requerim
 iniciales, apoyado en la ejecución continua de la suite de pruebas automatizadas. En cuanto a
 los artefactos, se gestionaron el **Product Backlog** (lista priorizada de historias de usuario), el
 **Sprint Backlog** (historias comprometidas por iteración) y el **Incremento** (módulos
-funcionales completados y verificados al final de cada Sprint).
+funcionales completados y verificados al final de cada Sprint). Estos tres pilares operan, en
+retrospectiva, como la forma concreta que tomó la fase `/plan → /tasks → /implement` de SDD
+durante la construcción del MVP, antes de que las especificaciones formales de la sección
+3.6.5 se redactaran.
 
 ---
 
@@ -1409,6 +1537,62 @@ completa, sino que además ejecuta una consulta adicional para poblar el arreglo
 motocicletas de la misma marca o categoría, funcionalidad que no existía en la versión previa
 del dominio del sistema y fue incorporada como valor diferencial de UX.
 
+###### 4.1.3.3 Aplicación de Spec-Driven Development (SDD) como metodología rectora de la implementación
+
+En cumplimiento del requisito metodológico principal de la investigación (secciones 3.6.5 y
+3.6.6), la fase de implementación se ejecutó bajo Spec-Driven Development (SDD) como
+mecanismo formal de trazabilidad entre los requerimientos funcionales del Capítulo I (Tabla 6)
+y el código construido durante los Sprints descritos en 4.1.3.2. Este resultado se materializó
+en dos artefactos verificables directamente en el repositorio del proyecto: la constitución
+técnica del proyecto y el catálogo de especificaciones por funcionalidad.
+
+**Tabla 10**
+*Principios no negociables de la constitución del proyecto (`.specify/memory/constitution.md`, v1.0.0)*
+
+| # | Principio | Síntesis |
+|---|---|---|
+| I | Arquitectura por capas estricta | `routes → controllers → services → repositories`; ninguna funcionalidad nueva puede saltarse una capa. |
+| II | Validación en el borde, con Zod | Todo dato de entrada se valida en `validators/` antes de llegar a un controller o service. |
+| III | Errores centralizados | Los errores de dominio se lanzan como clases de `errors/` y se resuelven en un único middleware. |
+| IV | Credenciales solo por entorno | Ninguna clave (Supabase, Gemini, Groq, JWT) se hardcodea; siempre vía `.env`. |
+| V | Tests como parte de la Definition of Done | Toda feature de backend requiere tests unitarios e integración; la cobertura vigente (~98%) es un piso, no un techo. |
+| VI | Simplicidad y no sobre-ingeniería | No se introducen abstracciones, capas o *flags* que la especificación no exija. |
+| VII | Frontend con el sistema de diseño vigente | Toda UI nueva sigue el stack y las reglas de diseño ya activas del proyecto. |
+
+*Nota.* Elaboración propia, a partir del contenido íntegro de `.specify/memory/constitution.md`.
+
+**Tabla 11**
+*Catálogo de especificaciones documentadas bajo SDD (`specs/`)*
+
+| # | Funcionalidad | Estado |
+|---|---|---|
+| 001 | Reportar publicación sospechosa | *Spec-first* (spec aprobada; `plan.md`/`tasks.md` pendientes) |
+| 002 | Identidad y autenticación de usuarios | Documentada (retroactiva) |
+| 003 | Perfil de usuario y verificación de vendedor | Documentada (retroactiva) |
+| 004 | Publicación de motocicletas | Documentada (retroactiva) |
+| 005 | Moderación de publicaciones | Documentada (retroactiva) |
+| 006 | Catálogo, búsqueda y mapa | Documentada (retroactiva) |
+| 007 | Favoritos del comprador | Documentada (retroactiva) |
+| 008 | Comunicación directa y notificaciones | Documentada (retroactiva) |
+| 009 | Estadísticas y panel del usuario | Documentada (retroactiva) |
+| 010 | Asistente virtual "Tico" | Documentada (retroactiva) |
+| 011 | Administración de usuarios y auditoría | Documentada (retroactiva) |
+
+*Nota.* Elaboración propia, a partir de `specs/README.md`. Las especificaciones 002-011
+documentan retroactivamente capacidades ya construidas durante los Sprints de la sección
+3.6.6, mientras que la 001 es la primera funcionalidad concebida directamente bajo el flujo
+`/specify → /plan → /tasks → /implement`, detallada en el Anexo 6.
+
+La correspondencia entre principios de la constitución y evidencia ya reportada en este
+capítulo es directa: el principio I formaliza como regla explícita la arquitectura en capas descrita
+en 4.1.3.1.1; el principio V formaliza la práctica de *Testing* de XP (4.1.3.1.4) como requisito
+de aceptación de cualquier funcionalidad futura, fijando el 98% de cobertura actual (sección
+4.1.4) como umbral mínimo y no como un logro puntual; y el principio VII enlaza el frontend
+del proyecto con el sistema de diseño definido globalmente para su desarrollo. De este modo,
+el SDD no introdujo un cambio de arquitectura ni de prácticas de codificación, sino que
+codificó explícitamente decisiones que, hasta antes de su adopción, dependían del criterio
+tácito del equipo de desarrollo.
+
 ##### 4.1.4 Resultados de la Validación de Funcionamiento (Variable X4)
 
 La evaluación de la dimensión de Funcionamiento tuvo como objetivo comprobar la
@@ -1425,7 +1609,7 @@ Tests:       250 passed, 250 total
 Snapshots:   0 total
 ```
 
-**Tabla 10**
+**Tabla 12**
 *Cobertura de código obtenida por la suite de pruebas automatizadas*
 
 | Métrica | Cobertura obtenida | Umbral configurado (`jest.config.cjs`) | Resultado |
@@ -1463,7 +1647,7 @@ mediante JWKS y la trazabilidad de las publicaciones (estado, autor, fecha) demo
 mecanismos pertinentes para garantizar un ecosistema comercial estructurado y auditable,
 superando las vulnerabilidades de los grupos informales de redes sociales.
 
-**Tabla 11**
+**Tabla 13**
 *Apreciación general de las funcionalidades verificadas de la plataforma*
 
 | Dimensión (Variable) | Aspecto observado | Descripción del aporte funcional | Evidencia |
@@ -1552,6 +1736,26 @@ prácticamente la totalidad del backend y el frontend) se ejecutó preservando e
 una cobertura de pruebas superior al 95%, lo que redujo drásticamente el riesgo de regresiones
 no detectadas durante un cambio de esa magnitud.
 
+En la misma línea metodológica, la aplicación de Spec-Driven Development (SDD) como
+metodología rectora del proyecto evidenció resolver un problema distinto al que atienden
+Scrum y XP por separado —marcos que, dentro del ciclo SDD, operaron como capas
+operativas subordinadas (sección 3.6.6)—: mientras Scrum
+organiza el **cuándo** (cadencia de entregas por Sprint) y XP prescribe el **cómo** se construye
+el código (pruebas, integración continua, diseño simple), ninguno de los dos fija formalmente
+el **qué** y el **por qué** de una funcionalidad como un contrato verificable a lo largo del tiempo.
+Pressman y Maxim (2021) atribuyen buena parte de los defectos de software de larga data a la
+divergencia progresiva entre la especificación original y el código en producción; en
+MotoMarket, redactar retroactivamente las especificaciones de las once capacidades del
+sistema (Tabla 11) permitió, precisamente, hacer explícita esa correspondencia y detectar que
+una misma responsabilidad de negocio (la revisión de documentos de verificación de
+vendedores) se encontraba inicialmente duplicada entre dos especificaciones redactadas desde
+actores distintos, inconsistencia que se corrigió antes de que derivara en una ambigüedad de
+implementación. Asimismo, la constitución técnica del proyecto (Tabla 10) demostró ser un
+mecanismo efectivo para transformar convenciones tácitas del equipo —como la arquitectura
+en capas o el piso de cobertura de pruebas— en reglas explícitas y auditables, reduciendo la
+dependencia del conocimiento tribal para mantener la consistencia del sistema a medida que
+crece.
+
 Desde la perspectiva de la arquitectura de software, la decisión de delegar la
 persistencia, la autenticación y el almacenamiento de imágenes en Supabase, en lugar de
 administrar un servidor de base de datos propio, demostró ser una decisión de ingeniería
@@ -1624,13 +1828,18 @@ Mobile First, centrada en el usuario del mercado de motocicletas.
 
 En relación al objetivo específico "c)", dirigido a determinar los resultados de la fase
 de implementación de la plataforma, se concluye que el proceso de codificación arrojó como
-resultado la construcción de un MVP plenamente operativo al término de cinco Sprints. En
-esta fase se comprobó la alta eficacia de integrar el marco de trabajo Scrum con las prácticas de
-ingeniería de Extreme Programming (XP) —reforzadas con automatización íntegra de pruebas
-como práctica central—, hibridación metodológica que permitió desarrollar de manera iterativa
-el frontend y el backend, manteniendo un código limpio, una cobertura de pruebas superior al
-95% y asegurando entregas modulares continuas incluso durante una migración de dominio de
-gran escala.
+resultado la construcción de un MVP plenamente operativo al término de cinco Sprints,
+ejecutado bajo el requisito metodológico principal de la investigación: la aplicación de
+**Spec-Driven Development (SDD)** como metodología rectora del proyecto, materializada en
+una constitución técnica de siete principios no negociables y en un catálogo de once
+especificaciones formales por funcionalidad, que dejó codificadas de manera explícita y
+auditable decisiones arquitectónicas que antes dependían del criterio tácito del equipo. Dentro
+de ese ciclo rector, se comprobó además la alta eficacia de integrar, como marcos operativos,
+el marco de trabajo Scrum con las prácticas de ingeniería de Extreme Programming (XP)
+—reforzadas con automatización íntegra de pruebas como práctica central—, hibridación
+metodológica que permitió desarrollar de manera iterativa el frontend y el backend,
+manteniendo un código limpio, una cobertura de pruebas superior al 95% y asegurando
+entregas modulares continuas incluso durante una migración de dominio de gran escala.
 
 En relación al objetivo específico "d)", centrado en validar el correcto funcionamiento
 de los módulos principales de la plataforma, se concluye que el sistema superó exitosamente
@@ -1691,6 +1900,20 @@ recomendaciones para futuras iteraciones del proyecto:
    al 95%, se recomienda incorporar pruebas E2E (por ejemplo, con Playwright o Cypress) que
    verifiquen los flujos críticos desde la perspectiva del navegador: registro, publicación de una
    motocicleta con imágenes, aplicación de filtros y contacto con el vendedor.
+
+7. **Completar el ciclo de Spec-Driven Development (SDD) para la especificación
+   001:** Se recomienda continuar el flujo `/plan → /tasks → /implement` sobre
+   `specs/001-reportar-publicacion`, hoy detenido en la etapa de especificación aprobada, de
+   modo que esta sea la primera funcionalidad del proyecto construida íntegramente bajo el
+   ciclo prospectivo de SDD, sirviendo como caso de referencia para las funcionalidades futuras
+   (numeradas consecutivamente desde `012`).
+
+8. **Consolidar la constitución técnica como criterio de revisión de código:** Dado que
+   los siete principios de `.specify/memory/constitution.md` ya formalizan explícitamente
+   decisiones arquitectónicas del proyecto, se recomienda incorporar su verificación como parte
+   del proceso de revisión de cada nuevo *pull request*, evitando que la constitución quede como
+   un documento de referencia pasivo y asegurando que su cumplimiento se sostenga a medida
+   que el equipo de desarrollo crezca.
 
 ---
 
@@ -1757,6 +1980,10 @@ Programming Language* (7ª ed.). O'Reilly Media.
 
 Freeman, E., & Robson, E. (2011). *Head First HTML5 Programming: Building Web
 Apps with JavaScript*. O'Reilly Media.
+
+GitHub. (2025). *Spec Kit: Un kit de herramientas para el desarrollo dirigido por
+especificaciones (Spec-Driven Development)* [Documentación de software]. GitHub.
+https://github.com/github/spec-kit
 
 Hassan Montero, Y. (2015). Experiencia de Usuario: Principios y Métodos. *El
 Profesional de la Información*.
@@ -1852,7 +2079,7 @@ Wroblewski, L. (2011). *Mobile first*. A Book Apart.
 
 | PROBLEMAS | OBJETIVOS | VARIABLES | MÉTODO DE INVESTIGACIÓN |
 |---|---|---|---|
-| **Problema general:** ¿Cuáles son los resultados del desarrollo de una plataforma web especializada en la compra y venta de motocicletas nuevas y usadas para el mercado peruano, 2025? | **Objetivo general:** Desarrollar una plataforma web especializada en la compra y venta de motocicletas nuevas y usadas para el mercado peruano, 2025. | **Variable de interés:** X: Plataforma web de compra y venta de motocicletas | **Tipo:** Aplicada · **Nivel:** Descriptivo · **Diseño:** No experimental, transversal |
+| **Problema general:** ¿Cuáles son los resultados del desarrollo de una plataforma web especializada en la compra y venta de motocicletas nuevas y usadas para el mercado peruano, 2025? | **Objetivo general:** Desarrollar una plataforma web especializada en la compra y venta de motocicletas nuevas y usadas para el mercado peruano, 2025. | **Variable de interés:** X: Plataforma web de compra y venta de motocicletas | **Tipo:** Aplicada · **Nivel:** Descriptivo · **Diseño:** No experimental, transversal · **Metodología de desarrollo:** Spec-Driven Development (SDD, central) con Scrum y XP como marcos operativos |
 | **Problemas específicos:** 1) fase de análisis, 2) fase de diseño, 3) fase de implementación, 4) validación del funcionamiento, 5) nivel de usabilidad | **Objetivos específicos:** 1) determinar análisis, 2) determinar diseño, 3) determinar implementación, 4) validar funcionamiento, 5) diseñar instrumento de usabilidad | **Variables descriptivas:** X1: Análisis · X2: Diseño · X3: Implementación · X4: Funcionamiento · X5: Usabilidad | **Población:** usuarios peruanos interesados en compra/venta de motocicletas · **Muestra:** 20 usuarios (10 compradores, 10 vendedores), no probabilística por conveniencia — pendiente de aplicación · **Técnicas:** análisis documental del código fuente, pruebas de software automatizadas, diseño de encuesta estandarizada · **Instrumentos:** reporte de cobertura de Jest, cuestionario SUS |
 
 *Nota.* Elaboración propia.
@@ -2097,3 +2324,77 @@ en el frontend de MotoMarket (`frontend/src/pages/`):
 *Nota.* Elaboración propia. Las capturas de pantalla e ilustraciones gráficas de cada
 vista deberán incorporarse como evidencia visual complementaria (por ejemplo, mediante
 herramientas de diseño como Figma) previamente a la sustentación final del proyecto.
+
+### Anexo 6. Spec-Driven Development (SDD): constitución técnica y catálogo de especificaciones
+
+#### 6.1 Flujo de trabajo SDD adoptado
+
+```
+/specify <descripción de la feature en lenguaje de negocio>
+    → specs/NNN-slug/spec.md        (qué y por qué — sin tecnología)
+
+/plan [feature]
+    → specs/NNN-slug/plan.md        (cómo — arquitectura, Constitution Check)
+    → data-model.md, contracts/, research.md   (opcionales, solo si aplica)
+
+/tasks [feature]
+    → specs/NNN-slug/tasks.md       (tareas atómicas y verificables, en orden)
+
+/implement [feature]
+    → ejecuta tasks.md tarea por tarea, marcando el progreso
+```
+
+*Nota.* Elaboración propia, a partir de `specs/README.md` y de las plantillas oficiales en
+`.specify/templates/` (`spec-template.md`, `plan-template.md`, `tasks-template.md`).
+
+#### 6.2 Constitución del proyecto (extracto íntegro de los principios)
+
+| Principio | Enunciado | Justificación registrada |
+|---|---|---|
+| I. Arquitectura por capas estricta | El backend sigue `routes → controllers → services → repositories`; ninguna feature nueva puede saltarse una capa. | Es el patrón ya establecido en `backend/src/`, lo que hace testeable cada capa de forma aislada. |
+| II. Validación en el borde, con Zod | Todo dato que entra por la API se valida con Zod en `validators/` antes de tocar un controller o service. | Evita validar "por si acaso" en capas internas que ya reciben datos confiables. |
+| III. Errores centralizados | Los errores de dominio se lanzan como clases de `errors/` y se resuelven en un único middleware de manejo de errores. | Ningún controller debe manejar manualmente casos de error ya cubiertos por ese sistema. |
+| IV. Credenciales solo por entorno | Ninguna clave (Supabase, Gemini, Groq, JWT secrets) se hardcodea; siempre vía `.env`/`.env.example`. | Ni en código ni en specs/plans versionados. |
+| V. Tests como parte de la Definition of Done | Toda feature de backend se entrega con tests unitarios e integración en `backend/tests/`. | El estado actual (250/250 tests, ~98% cobertura) es el piso a mantener, no un techo. |
+| VI. Simplicidad y no sobre-ingeniería | No se introducen abstracciones, capas o *flags* nuevos que la spec no pida. | Aplica tanto al backend por capas como al frontend (React + Vite). |
+| VII. Frontend con el sistema de diseño ya vigente | Cualquier UI nueva sigue el stack y reglas ya activas para el proyecto (Framer Motion, Tailwind, jerarquía de motion, anti-genérico). | Un plan de frontend no re-explica esas reglas, solo las aplica. |
+
+*Nota.* Reproducido y sintetizado a partir de `.specify/memory/constitution.md` (versión 1.0.0,
+ratificada el 2026-07-09). Cualquier plan técnico que se desvíe de un principio debe
+justificarlo explícitamente en su sección "Constitution Check", o el plan se rechaza.
+
+#### 6.3 Ejemplo de especificación *spec-first*: `specs/001-reportar-publicacion`
+
+A modo de evidencia del formato exigido por la plantilla oficial (`spec-template.md`), se
+reproduce una síntesis de la primera especificación construida prospectivamente bajo SDD:
+
+- **Input de negocio:** los compradores necesitan poder reportar una publicación de
+  motocicleta que parece sospechosa (posible estafa, datos falsos, moto ya no disponible,
+  contenido inapropiado), para que un administrador la revise y actúe.
+- **Requisitos funcionales (extracto):** un comprador autenticado puede reportar una
+  publicación ajena eligiendo un motivo de una lista fija; el sistema exige texto libre si el
+  motivo es "otro"; un mismo comprador no puede duplicar un reporte sobre la misma
+  publicación; un vendedor no puede reportar su propia publicación; todo reporte queda
+  visible para los administradores como parte del flujo de moderación ya existente; la
+  resolución de un reporte (descartar o accionar sobre la publicación) queda registrada en la
+  bitácora de auditoría.
+- **Fuera de alcance (explícito):** ocultar o suspender automáticamente una publicación por
+  volumen de reportes; notificar al vendedor de que fue reportado antes de que un
+  administrador actúe; reportar usuarios o mensajes del chat.
+- **Estado a la fecha de esta documentación:** `spec.md` aprobado; `plan.md`, `tasks.md` e
+  implementación pendientes (ver Recomendación 7, Capítulo V).
+
+*Nota.* Síntesis elaborada a partir del contenido íntegro de
+`specs/001-reportar-publicacion/spec.md`.
+
+#### 6.4 Nota de reconciliación documentada durante la redacción retroactiva
+
+Durante la redacción retroactiva de las especificaciones 002-011, el equipo detectó que la
+revisión de documentos de verificación de vendedores aparecía duplicada entre las
+especificaciones 003 y 011, por haberse redactado cada una desde el actor que ejecuta la
+acción (vendedor / administrador) en lugar de desde el ciclo de negocio completo. La
+inconsistencia se corrigió dejando esa responsabilidad únicamente en la especificación 003
+(dueña del ciclo envío→revisión), acotando la 011 a la gestión de usuarios, el panel
+administrativo y la bitácora de auditoría. Esta corrección quedó registrada como regla a futuro:
+una especificación debe cubrir un ciclo de negocio completo con todos sus actores, nunca
+partirse por "quién ejecuta la acción" (`specs/README.md`, nota del 2026-07-09).
